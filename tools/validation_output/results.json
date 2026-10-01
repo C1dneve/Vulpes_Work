@@ -1,0 +1,721 @@
+{
+  "t1": {
+    "status": "✅",
+    "evidence": "startAt: pág.1=2 itens, pág.2=2 itens disjuntos; total=50",
+    "mecanismo": "startAt",
+    "pagina1": [
+      "SCRUM-7",
+      "SCRUM-30"
+    ],
+    "pagina2": [
+      "SCRUM-6",
+      "SCRUM-16"
+    ],
+    "meta1": {
+      "startAt": 0,
+      "maxResults": 2,
+      "total": 50,
+      "isLast": null
+    },
+    "meta2": {
+      "startAt": 2,
+      "maxResults": 2,
+      "total": 50,
+      "isLast": null
+    },
+    "teto": {
+      "maxResults_ecoado": 100,
+      "retornados": 50
+    },
+    "chaves_topo": [
+      "expand",
+      "issues",
+      "maxResults",
+      "startAt",
+      "total"
+    ]
+  },
+  "t2": {
+    "status": "✅",
+    "evidence": "closedSprints real com chaves esperadas (35 issues); epic resolvido em 17/46 (epic=0, parent=17)",
+    "amostra": 50,
+    "cobertura": {
+      "epic": {
+        "null": 50
+      },
+      "closedSprints": {
+        "preenchido": 35,
+        "ausente": 15
+      },
+      "sprint": {
+        "null": 39,
+        "preenchido": 11
+      },
+      "issuetype": {
+        "preenchido": 50
+      },
+      "status": {
+        "preenchido": 50
+      },
+      "flagged": {
+        "preenchido": 50
+      }
+    },
+    "estrutura": {
+      "epic": "n/d",
+      "closedSprints": "list[1] de dict{completeDate,createdDate,endDate,goal,id,name,originBoardId,self,startDate,state}",
+      "sprint": "dict{createdDate,endDate,goal,id,name,originBoardId,self,startDate,state}",
+      "issuetype": "dict{avatarId,description,entityId,hierarchyLevel,iconUrl,id,name,self,subtask}",
+      "status": "dict{description,iconUrl,id,name,self,statusCategory}",
+      "flagged": "bool"
+    },
+    "tipos": {
+      "História": 17,
+      "Epic": 4,
+      "Subtask": 29
+    },
+    "sprint_estados": {
+      "sem sprint": 39,
+      "future": 11
+    },
+    "closed_exemplo": {
+      "issue": "SCRUM-7",
+      "presente": {
+        "id": true,
+        "name": true,
+        "state": true,
+        "startDate": true,
+        "endDate": true,
+        "completeDate": true
+      },
+      "n_issues": 35
+    },
+    "sprints_encerradas_no_board": 1,
+    "epic": {
+      "via_epic": 0,
+      "via_parent": 17,
+      "de": 46,
+      "estrutura": null
+    }
+  },
+  "t3": {
+    "status": "⚠️",
+    "evidence": "estrutura confirmada (total/startAt/maxResults) mas nenhuma issue com ≥2 worklogs",
+    "pagina1": {
+      "issue": "SCRUM-44",
+      "total": 1,
+      "startAt": 0,
+      "maxResults": 1,
+      "retornados": 1,
+      "chaves": [
+        "maxResults",
+        "startAt",
+        "total",
+        "worklogs"
+      ]
+    }
+  },
+  "t4": {
+    "status": "✅",
+    "evidence": "SCRUM-7: total=15; pág.1/pág.2 (maxResults=1) com ids distintos",
+    "pagina1": {
+      "issue": "SCRUM-7",
+      "total": 15,
+      "startAt": 0,
+      "maxResults": 1,
+      "isLast": false,
+      "retornados": 1,
+      "chaves": [
+        "isLast",
+        "maxResults",
+        "nextPage",
+        "self",
+        "startAt",
+        "total",
+        "values"
+      ],
+      "chaves_item": [
+        "field",
+        "fieldtype",
+        "from",
+        "fromString",
+        "to",
+        "toString"
+      ]
+    },
+    "pagina2": {
+      "issue": "SCRUM-7",
+      "total": 15,
+      "startAt": 1,
+      "maxResults": 1,
+      "retornados": 1
+    }
+  },
+  "t9": {
+    "status": "✅",
+    "evidence": "Story Points numéricos encontrados em ['customfield_10016']",
+    "story_points": {
+      "customfield_10016": {
+        "stories": "17/21",
+        "subtasks": "0/29"
+      }
+    },
+    "flagged_fields": [
+      "customfield_10021"
+    ],
+    "board_estimation": "customfield_10016",
+    "cobertura": {
+      "duedate": {
+        "preenchido": 17,
+        "null": 33
+      },
+      "priority": {
+        "preenchido": 50
+      },
+      "issuelinks": {
+        "vazio": 50
+      },
+      "flagged (boolean do agile)": {
+        "preenchido": 50
+      }
+    },
+    "links_bloqueio": 0,
+    "changelog_fields": {
+      "IssueParentAssociation": 10,
+      "summary": 14,
+      "priority": 12,
+      "Start date": 6,
+      "Sprint": 4,
+      "Story point estimate": 7,
+      "status": 14,
+      "resolution": 4,
+      "duedate": 6,
+      "Classificação": 7,
+      "assignee": 3,
+      "Link": 10,
+      "Issue color": 1,
+      "Epic Color": 1
+    },
+    "evento_sprint": {
+      "from": "",
+      "to": "3",
+      "fromString": "",
+      "toString": "Sprint 1"
+    }
+  },
+  "t5": {
+    "status": "✅",
+    "evidence": "HTTP 200 para 1 branch(es) com '/' (A=quote(safe='/.'))",
+    "resultados": [
+      {
+        "branch": "feature/docs/transversal-atualiza-guia-contribuicao",
+        "variantes": [
+          {
+            "variante": "A projeto: quote(safe='/.')",
+            "http": 200,
+            "erro": null,
+            "status": "diverged",
+            "ahead_by": 2,
+            "behind_by": 1,
+            "total_commits": 2,
+            "commits_na_pagina": 2,
+            "mensagem": null,
+            "url_enviada": "https://api.github.com/repos/Team-GesTec/sistema-ordens-servico/compare/main...feature/docs/transversal-atualiza-guia-contribuicao?per_page=100&page=1"
+          },
+          {
+            "variante": "B tudo codificado (%2F)",
+            "http": 200,
+            "erro": null,
+            "status": "diverged",
+            "ahead_by": 2,
+            "behind_by": 1,
+            "total_commits": 2,
+            "commits_na_pagina": 1,
+            "mensagem": null,
+            "url_enviada": "https://api.github.com/repos/Team-GesTec/sistema-ordens-servico/compare/main...feature%2Fdocs%2Ftransversal-atualiza-guia-contribuicao?per_page=1"
+          },
+          {
+            "variante": "C sem codificar",
+            "http": 200,
+            "erro": null,
+            "status": "diverged",
+            "ahead_by": 2,
+            "behind_by": 1,
+            "total_commits": 2,
+            "commits_na_pagina": 1,
+            "mensagem": null,
+            "url_enviada": "https://api.github.com/repos/Team-GesTec/sistema-ordens-servico/compare/main...feature/docs/transversal-atualiza-guia-contribuicao?per_page=1"
+          }
+        ]
+      }
+    ]
+  },
+  "t6": {
+    "status": "❓",
+    "evidence": "nenhum commit real com author.date ≠ committer.date para separar as hipóteses",
+    "examinados": 17
+  },
+  "t7": {
+    "status": "❓",
+    "evidence": "nenhuma PR com padrão de rebase identificável; Rebase-and-merge não pôde ser validado conclusivamente",
+    "contagem": {
+      "merge": 0,
+      "rebase_compat": 0,
+      "squash_compat": 10,
+      "ambiguo": 0
+    },
+    "prs": [
+      {
+        "pr": 24,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-27T16:30:24Z",
+          "merge_commit_sha=d28286e",
+          "head=feature/Transversal@097d1f1 base=main",
+          "commits da PR=39 (campo commits=39)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 25,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-27T23:10:52Z",
+          "merge_commit_sha=bfe5806",
+          "head=feature/docs/transversal-atualiza-guia-contribuicao@2e63ba3 base=main",
+          "commits da PR=1 (campo commits=1)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 22,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-26T20:03:19Z",
+          "merge_commit_sha=f324716",
+          "head=feature/docs/transversal-guia-contribuicao@d966fe3 base=main",
+          "commits da PR=1 (campo commits=1)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 23,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-26T21:15:17Z",
+          "merge_commit_sha=7838f7d",
+          "head=feature/Transversal@218ab1d base=main",
+          "commits da PR=37 (campo commits=37)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 15,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-16T21:40:56Z",
+          "merge_commit_sha=98ee756",
+          "head=feat/transversal-estrutura-testes@ad4ddaf base=main",
+          "commits da PR=1 (campo commits=1)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 4,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-08T23:38:58Z",
+          "merge_commit_sha=44d5611",
+          "head=chore/estrutura-backend@460499b base=main",
+          "commits da PR=3 (campo commits=3)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 7,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-14T22:33:14Z",
+          "merge_commit_sha=4468117",
+          "head=feat/schema@417ccb9 base=main",
+          "commits da PR=4 (campo commits=4)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 9,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-15T23:04:38Z",
+          "merge_commit_sha=84ac26e",
+          "head=fix/docs/transversal-edita-readme@98d2cf1 base=main",
+          "commits da PR=1 (campo commits=1)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 8,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-14T23:04:46Z",
+          "merge_commit_sha=0f5d922",
+          "head=feature/docs/transversal-guia-contribuicao@248ea22 base=main",
+          "commits da PR=1 (campo commits=1)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      },
+      {
+        "pr": 6,
+        "classe": "compatível com squash",
+        "observado": [
+          "state=closed merged_at=2026-09-14T21:45:37Z",
+          "merge_commit_sha=0762211",
+          "head=main@5987ae3 base=main",
+          "commits da PR=3 (campo commits=3)",
+          "último commit da PR == head.sha: True",
+          "merge_commit_sha tem 1 pai(s)",
+          "committer do merge_commit == web-flow: True",
+          "head.sha da PR é ancestral de main: False (compare status=diverged)"
+        ],
+        "inferencia": [
+          "1 commit na main com sufixo (#N) no título e sem correspondência 1-1 com os da PR: compatível com squash"
+        ]
+      }
+    ],
+    "metodos_habilitados": {
+      "allow_merge_commit": null,
+      "allow_squash_merge": null,
+      "allow_rebase_merge": null
+    }
+  },
+  "t10": {
+    "status": "✅",
+    "evidence": "reviews lidos em 10 PRs; estados {'APPROVED': 9}",
+    "chaves_listagem": {
+      "requested_reviewers": true,
+      "requested_teams": true,
+      "draft": true,
+      "merged_at": true,
+      "user": true
+    },
+    "estados_review": {
+      "APPROVED": 9
+    },
+    "amostra": [
+      {
+        "pr": 27,
+        "estado_pr": "open",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 24,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 19,
+        "estado_pr": "closed",
+        "reviews": 0,
+        "chaves_review": [],
+        "tipo_usuario": null,
+        "submitted_at": null
+      },
+      {
+        "pr": 25,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 22,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 23,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 21,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 17,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 15,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      },
+      {
+        "pr": 4,
+        "estado_pr": "closed",
+        "reviews": 1,
+        "chaves_review": [
+          "_links",
+          "author_association",
+          "body",
+          "commit_id",
+          "html_url",
+          "id",
+          "node_id",
+          "pull_request_url",
+          "state",
+          "submitted_at",
+          "user"
+        ],
+        "tipo_usuario": "User",
+        "submitted_at": true
+      }
+    ]
+  },
+  "t8": {
+    "status": "✅",
+    "evidence": "medido: Jira=43 GitHub=42 total=85 em 14.9s",
+    "jira": 43,
+    "github": 42,
+    "total": 85,
+    "secs": 14.9,
+    "por_endpoint": {
+      "Jira": {
+        "GET /rest/agile/1.0/board/{board}/sprint": 1,
+        "GET /rest/api/3/field": 1,
+        "GET /rest/agile/1.0/board/{board}/issue": 1,
+        "GET /rest/api/3/issue/{key}/changelog": 40
+      },
+      "GitHub": {
+        "GET /repos/{org}/{repo}": 1,
+        "GET /repos/{org}/{repo}/branches": 1,
+        "GET /repos/{org}/{repo}/pulls": 2,
+        "GET /repos/{org}/{repo}/commits": 1,
+        "GET /repos/{org}/{repo}/pulls/{n}/commits": 18,
+        "GET /repos/{org}/{repo}/pulls/{n}/reviews": 18,
+        "GET /repos/{org}/{repo}/compare/{basehead}": 1
+      }
+    },
+    "status_http": {
+      "Jira 200": 43,
+      "GitHub 200": 42
+    },
+    "cota_consumida_estimada": 42,
+    "menor_restante_visto": 4836,
+    "notas": [],
+    "execucoes": {
+      "jira": {
+        "secs": 6.7280259999997725,
+        "status": "ok",
+        "stats": {
+          "issues": 50,
+          "stories": 17,
+          "items": 40,
+          "worklogs": 22,
+          "changelog": 76,
+          "sprints": 4,
+          "worklog_partial": [],
+          "changelog_partial": [],
+          "story_points_field": "customfield_10016",
+          "api_calls": 43
+        },
+        "warnings": [],
+        "errors": [],
+        "http_calls_attr": 43
+      },
+      "github": {
+        "secs": 8.158678599999803,
+        "status": "ok",
+        "stats": {
+          "commits": 70,
+          "branches": 1,
+          "prs": 27,
+          "lookback_days": 90,
+          "api_calls": 42,
+          "rate_remaining": 4836.0,
+          "repos": [
+            "sistema-ordens-servico"
+          ]
+        },
+        "warnings": [],
+        "errors": [],
+        "http_calls_attr": 42
+      }
+    },
+    "bloqueadas": {}
+  }
+}

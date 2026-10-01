@@ -1,0 +1,20 @@
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+extend-exclude = ["venv", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]
+ignore = ["E731", "E701", "E702", "B008", "E741"]   # estilo compacto já usado no projeto
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501", "B011"]
+"app.py" = ["E501"]            # HTML/CSS e f-strings longos; legibilidade > limite de colunas
+"ui_components.py" = ["E501"]
+"tools/*.py" = ["E501"]         # ferramenta de diagnóstico com saídas longas
+"views/*.py" = ["E501"]         # telas Streamlit: mesma política de app.py/ui_components.py
+"services/*.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,36 @@
+{
+  "github": {
+    "org": "Team-GesTec",
+    "repos": [
+      "sistema-ordens-servico"
+    ],
+    "lookback_days": 90,
+    "bot_logins": []
+  },
+  "regex": {
+    "jira_key_pattern": null,
+    "subtask_summary_pattern": "^\\s*(BE|FE|UXDB)-?\\s*0*(\\d+)",
+    "use_jira_key_as_canonical": false
+  },
+  "dev_mapping": {
+    "samuelmartins00": "samuel-martins",
+    "c1dneve": "cid-daniel-neves-d-oliveira",
+    "guilherme-leite1701": "guilherme-leite",
+    "ninaduquehc": "marina-duque-de-holanda-cavalcanti",
+    "pamelaiwabuchi": "pamela",
+    "pedroprdgs": "pedro-pereira-rodrigues",
+    "rafaelmionic": "rafael-silva-mioni-coltro",
+    "vitorassishasmandiniz": "vitor-assis-hasman-diniz"
+  },
+  "jira": {
+    "story_points_field": ""
+  },
+  "management": {
+    "due_soon_days": 2,
+    "inactive_business_days": 2,
+    "pr_review_wait_hours": 24,
+    "pr_old_days": 5,
+    "sprint_ending_days": 2,
+    "recent_days": 2
+  }
+}

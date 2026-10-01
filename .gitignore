@@ -1,0 +1,19 @@
+# ambiente / segredos
+venv/
+.venv/
+.env
+.streamlit/secrets.toml
+snapshots/
+*.zip
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# editores / sistema
+.DS_Store
+.idea/
+.vscode/
