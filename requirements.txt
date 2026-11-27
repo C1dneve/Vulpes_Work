@@ -3,7 +3,7 @@ streamlit==1.67.0
 pandas==2.3.3
 plotly==6.6.0
 requests==2.33.0
-python-dotenv==1.2.2
+python-dotenv==1.2.4
 pillow==13.0.0
 # zoneinfo("America/Sao_Paulo") precisa do banco de fusos; no Windows ele vem deste pacote.
 tzdata==2025.3
