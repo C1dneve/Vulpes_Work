@@ -1,10 +1,13 @@
-# MVP de acompanhamento de Sprint — estado e regras
+# Development Analytics (Streamlit) — estado atual e regras
+
+
+> Este documento descreve somente a baseline atual do módulo Development Analytics em Streamlit. A visão, decisões e roadmap do produto completo estão em [`DOCUMENTO_GERAL.md`](DOCUMENTO_GERAL.md); o plano de execução vigente está em [`plano/PLANO_IMPLEMENTACAO.md`](plano/PLANO_IMPLEMENTACAO.md).
 
 A baseline anterior à evolução do MVP tinha 224 testes. A suíte atual passou com 440 testes e cobertura reportada de 85%. A comparação individual das asserções originais com a baseline ainda precisa ser documentada; a contagem maior de testes, por si só, não comprova essa equivalência.
 
 Este documento descreve o que o MVP faz hoje, suas regras, os resultados de validação disponíveis e o que ainda não está resolvido.
 
-## Estado da Fase 0 — 27/11/2026
+## Estado da Fase 0 — evidências registradas em 27/11/2026
 
 | Item | Situação |
 |---|---|
@@ -15,15 +18,37 @@ Este documento descreve o que o MVP faz hoje, suas regras, os resultados de vali
 | Configuração | `load_settings()` retornou `ready=True`, sem variáveis obrigatórias ausentes. |
 | Spike RLS | 6 testes aprovados em ambiente PostgreSQL descartável. |
 | Probe de critérios de aceite | 20 issues consultadas, nenhuma falha de API e nenhuma seção formal de critérios de aceite encontrada. Resultado inconclusivo para medir a precisão do parser. |
-| GitHub Actions | Aguardando commit e push para validar o workflow e a matriz Python 3.12/3.13. |
-| Baseline de testes | Comparação das 224 asserções originais com a suíte atual ainda pendente. |
+| GitHub Actions | Execução remota #14, no commit `40dddf4` (27/11/2026), falhou no job Gitleaks (código 1). Os logs/annotations não ficaram acessíveis nesta sessão; o resultado individual da matriz de qualidade não foi confirmado. |
+| Baseline de testes | O commit de referência que contém as 224 asserções não foi localizado no histórico disponível. A comparação exata continua bloqueada; não declarar equivalência pela contagem. |
+| Higiene do pacote | `.coverage`, patch antigo e saídas reais foram inspecionados e retirados do índice Git na branch local; os arquivos físicos foram preservados e estão ignorados. `results.example.json` permanece como exemplo versionável. |
+| Licença e distribuição | ADR-014 permanece pendente; decisão antes da Fase 5/publicação externa e não bloqueia a Fase 0. |
 
 Os resultados locais foram executados pelo mantenedor. Eles não substituem a execução do workflow no GitHub, que também examinará o histórico completo do repositório.
+
+## Reexecução independente nesta sessão — 27/11/2026
+
+Os itens da tabela anterior são resultados históricos reportados pelo mantenedor. A tabela abaixo registra somente o que foi repetido nesta sessão no clone recebido; resultados bloqueados não são tratados como aprovados.
+
+| Verificação | Resultado nesta sessão |
+|---|---|
+| Clone e histórico | Clone Git válido; branch de trabalho `chore/phase-0-stabilization`, baseada no `origin/main` disponível no ZIP. O `git fetch --prune origin` falhou por DNS; as refs remotas não puderam ser atualizadas. |
+| Ambiente | Python 3.13.5 e uv 0.10.0. Python 3.12 não estava instalado; o workflow fixa uv 0.13.9. |
+| `uv sync --frozen --all-groups` | Bloqueado por falha de DNS ao acessar `files.pythonhosted.org`; o ambiente não foi reproduzido e nenhuma dependência foi atualizada. |
+| `compileall` | Aprovado para os módulos da aplicação, testes e ferramentas incluídos no comando. |
+| Suíte completa com cobertura | Bloqueada na coleta: cinco módulos de interface falharam por `ModuleNotFoundError: streamlit`, ausente no ambiente. |
+| Suíte reduzida com cobertura | 413 testes passaram, com 85% de cobertura no subconjunto, excluindo `test_app_smoke.py`, `test_mvp_app.py`, `test_people_view.py`, `test_timeline_view.py` e `test_ui_components.py`. Não equivale à suíte completa nem ao resultado histórico de 440 testes. |
+| Comparação histórica auxiliar | O commit raiz local `8412ce8` permitiu coletar 375 casos com as mesmas cinco exclusões; todos os 375 node IDs também aparecem na suíte atual, que coleta 413 (38 adicionais). Esse commit não foi identificado como a baseline original de 224 asserções, portanto a comparação exigida continua bloqueada. |
+| Ruff, mypy e `pip-audit` | Não executados: os respectivos executáveis não estão instalados no ambiente; a sincronização de dependências foi bloqueada. |
+| Docker Compose | Não executado: Docker/Compose não estão instalados/disponíveis. Não há evidência nova de build, healthcheck ou usuário não-root. |
+| Gitleaks | Não executado localmente: binário ausente. A execução remota #14 terminou com código 1 no job de Gitleaks; a página pública não disponibilizou logs/annotations para classificar o achado. |
+| CI Python 3.12/3.13 | Workflow configurado com matriz 3.12/3.13; a execução remota #14 falhou no conjunto. O resultado detalhado dos jobs da matriz não ficou acessível, portanto não foi considerado aprovado. |
+
+A execução remota #14 está em [`GitHub Actions`](https://github.com/C1dneve/Vulpes_Work/actions/runs/46018835837). A Fase 0 permanece **aberta** até que os bloqueios obrigatórios sejam resolvidos e comprovados. Nenhuma credencial foi usada nem chamada às APIs Jira/GitHub foi feita; houve apenas consulta pública do status do Actions e tentativa de `git fetch`, bloqueada por DNS.
 
 ## Como executar
 O ambiente oficial é reproduzido por `uv.lock` em Python 3.12. Na raiz do projeto:
 ```bash
-uv sync --frozen
+uv sync --frozen --all-groups
 uv run streamlit run app.py
 uv run pytest -q                          # suíte completa (inclui o app inteiro com Jira/GitHub simulados)
 uv run python tools/validate_real_apis.py # validação REAL read-only (usa seu .env local; ver "Validação real")
@@ -147,6 +172,17 @@ A medição deve ser repetida quando as issues passarem a usar esse formato.
 ## Regressões
 A suíte atual cobre as regras de vínculo Commit → Subtask, Sprint própria da Subtask, Jira Key oficial, `on_main` × `delivered_via_pr`, cache (`clear()` ≠ `reset()`) e payload inesperado. A execução mais recente passou com 440 testes. Para declarar formalmente que as 224 asserções da baseline original foram preservadas, ainda falta comparar a suíte e os arquivos de teste com o commit de referência anterior à evolução do MVP.
 
-## Fora do MVP (P1/P2 restantes)
-P1: página Jira ↔ GitHub dedicada; leitura de comentários (motivo de bloqueio); histórico de pontos/estimativas; changelog de Stories; feriados/expediente.
-P2: autenticação/OIDC, PostgreSQL e histórico persistente/snapshots, notificações (Teams/WhatsApp/e-mail), PDFs, scheduler, CFD/gargalos, busca global.
+## Roadmap além da baseline atual
+
+O módulo Streamlit permanece preservado. A evolução do produto completo segue as fases do [`Documento Geral`](DOCUMENTO_GERAL.md): Fase 1 (fundação e piloto de atribuições), Fase 2 (Analytics persistente, sincronização e produtividade pessoal), Fase 3 (Knowledge Hub e Canais), Fase 4 (automações e IA assistiva) e Fase 5 (SaaS/expansão). Não usar a terminologia antiga P1/P2 deste documento para reclassificar o roadmap vigente.
+
+
+### Evidências complementares — 27/11/2026
+
+- Python 3.12 e 3.13: instalação limpa, Ruff, mypy, pytest (440 aprovados, 85% de cobertura) e pip-audit aprovados.
+- Docker Compose: imagem construída, container iniciado, usuário não-root 10001:10001 e healthcheck HTTP 200.
+- Gitleaks: varredura histórica de 4 commits e aproximadamente 3,43 MB concluída sem achados, exit code 0.
+- Dez fingerprints Sourcegraph registrados individualmente em `.gitleaksignore`, após confirmação do mantenedor de que são fictícios.
+- `.env` permanece ignorado e não rastreado pelo Git.
+- A comparação das 224 asserções originais continua pendente.
+- A validação do GitHub Actions continua pendente de execução remota.

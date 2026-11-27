@@ -1,5 +1,8 @@
 # Política de dependências
 
+> Fonte normativa de produto e decisões: [`Documento Geral V1.2`](DOCUMENTO_GERAL.md).
+
+
 - Revisar dependências diretas e transitivas mensalmente por meio do Dependabot.
 - Executar a suíte de testes, Ruff, mypy e `pip-audit` antes de mesclar atualizações.
 - Atualizações que corrigem vulnerabilidades de segurança têm prioridade sobre melhorias não relacionadas.
@@ -16,7 +19,7 @@ Na preparação inicial dessas atualizações, o lockfile ainda continha o grafo
 ## Comandos de desenvolvimento
 
 ```bash
-uv sync --all-groups
+uv sync --frozen --all-groups
 uv run ruff check .
 uv run mypy domain application contracts
 uv run pytest -q

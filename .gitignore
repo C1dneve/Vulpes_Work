@@ -27,5 +27,11 @@ tools/validation_output/*
 !tools/validation_output/README.md
 !tools/validation_output/results.example.json
 
+# cobertura e patch de revisão local (não versionar)
+.coverage
+.coverage.*
+htmlcov/
+Vulpes_Hub-revisao.patch
+
 # logs locais
 *.log

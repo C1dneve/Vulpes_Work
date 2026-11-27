@@ -1,8 +1,10 @@
-# Vulpes Hub — Registro de Decisões Arquiteturais (ADRs)
+# Vulpes Work — Registro de Decisões Arquiteturais (ADRs)
 
-Versão 1.0 · 25/11/2026 · Acompanha o «Vulpes Hub — Plano de Implementação (Fases, Épicos e User Stories)».
+Versão 1.2 · 27/11/2026 · Acompanha o Documento Geral V1.2 e o Plano de Implementação vigente do Vulpes Work.
 
 ## Como usar
+
+O Documento Geral V1.2 aprovado pelo usuário é a fonte de verdade de produto; estas ADRs registram decisões técnicas e não podem contrariar decisões posteriores do usuário.
 
 Cada ADR registra uma decisão técnica que afeta mais de um épico. **Status:** *Proposta* = registrada, mas ainda não aprovada; *Pendente* = depende de um spike, parecer ou informação externa; *Aceita* = aprovada pelo mantenedor. As ADRs 001 a 013 foram aprovadas em 27/11/2026. A ADR-014 continua pendente. Cada decisão tem um **gatilho de revisão**; uma ADR aceita só muda por outra ADR que a substitua.
 
@@ -21,9 +23,9 @@ Cada ADR registra uma decisão técnica que afeta mais de um épico. **Status:**
 | ADR-011 | Critérios de aceite: template Markdown e versionamento | Aceita | 1 |
 | ADR-012 | Estados da atribuição e mapeamento para status do Jira | Aceita | 1 |
 | ADR-013 | IA: gateway híbrido, desligado por padrão, registro determinístico | Aceita | 4 |
-| ADR-014 | Licença source-available | Pendente (parecer jurídico; direitos reservados provisoriamente) | 0 |
+| ADR-014 | Licença e distribuição | Pendente; não bloqueia a Fase 0; decidir antes da Fase 5/publicação externa | Antes da Fase 5 |
 | ADR-015 | Privacidade, retenção, exportação e exclusão | Proposta | 1 |
-| ADR-016 | Chat: construir ou integrar | Pendente (spike EP-40) | 3 |
+| ADR-016 | Chat: construir ou integrar | Pendente (spike/ADR antes do EP-32, Fase 3) | 3 |
 | ADR-017 | Observabilidade mínima | Proposta | 1 |
 
 ## ADR-001 — Monólito modular com fronteiras verificadas
@@ -147,15 +149,15 @@ Cada ADR registra uma decisão técnica que afeta mais de um épico. **Status:**
 - **Consequências:** mais trabalho antes da primeira funcionalidade de IA, em troca de segurança e auditabilidade.
 - **Revisar quando:** as avaliações mostrarem qualidade suficiente para ampliar autonomia, ou a política de dados de um provedor mudar.
 
-## ADR-014 — Licença source-available
+## ADR-014 — Licença e distribuição
 
-- **Status:** Pendente (parecer jurídico)
-- **Contexto:** o produto será self-hosted e SaaS. A decisão P36 foi «source-available (BSL ou similar)». Essas licenças não são «open source» pela definição da OSI. A licença definitiva e a política de contribuição ainda dependem de parecer jurídico.
-- **Diretriz provisória aprovada pelo mantenedor (26/11/2026):** manter todos os direitos reservados até a definição jurídica definitiva, sem conceder licença de uso a terceiros. Esta diretriz é temporária; não escolhe a licença final, não define titularidade formal e não satisfaz o critério de conclusão da US-03.2.
+- **Status:** Pendente — decisão deliberadamente adiada; não bloqueia a Fase 0. Resolver antes do início da Fase 5 ou antes de publicação externa que exija definição jurídica.
+- **Contexto:** o objetivo atual é desenvolver e implantar o Vulpes Work para uso próprio. O deploy pode preceder a definição de SaaS, licença ou monetização. A preferência histórica por source-available (BSL ou similar) não foi ratificada como licença definitiva; qualquer licença continua sujeita a parecer jurídico.
+- **Diretriz provisória vigente:** manter todos os direitos reservados até a definição jurídica definitiva, sem conceder licença de uso a terceiros. Esta diretriz é temporária; não escolhe a licença final e não define titularidade formal. Não executar trabalho jurídico nem tratar esta decisão como bloqueio de Fase 0.
 - **Decisão proposta:** após o parecer jurídico, escolher entre BSL 1.1 (com data de conversão e uma restrição de uso definida), FSL, Elastic License v2 ou outra equivalente. Definir também a política de contribuição (CLA ou DCO) e a possibilidade de licença comercial dupla.
 - **Alternativas:** MIT ou Apache (permissivas); AGPL (copyleft forte). Nenhuma dessas alternativas foi adotada.
-- **Consequências:** até a decisão definitiva, este repositório não concede licença de uso, cópia, modificação ou distribuição a terceiros. A escolha futura afetará quem pode hospedar o produto e como contribuições externas são aceitas.
-- **Revisar quando:** houver parecer jurídico e decisão formal sobre a licença, a titularidade e a política de contribuição; ou mudar o modelo de negócio.
+- **Consequências:** até a decisão definitiva, este repositório não concede licença de uso, cópia, modificação ou distribuição a terceiros. O uso próprio pode avançar; antes de distribuição/publicação externa, a licença, titularidade e política de contribuição precisam ser decididas.
+- **Revisar quando:** antes do início da Fase 5 ou de publicação externa que exija decisão jurídica; considerar parecer sobre licença, titularidade e política de contribuição.
 
 ## ADR-015 — Privacidade, retenção, exportação e exclusão
 
@@ -168,7 +170,7 @@ Cada ADR registra uma decisão técnica que afeta mais de um épico. **Status:**
 
 ## ADR-016 — Chat: construir ou integrar
 
-- **Status:** Pendente (spike EP-40, no fim da Fase 2)
+- **Status:** Pendente (spike/ADR antes do EP-32, Fase 3)
 - **Contexto:** a decisão P29 foi um chat próprio simples na Fase 3, reavaliando Mattermost ou Matrix antes. O bloco F do Plano Mestre inclui muitos recursos de mensagens que são, juntos, um produto à parte.
 - **Opções a comparar:** (a) chat próprio mínimo (canais por time, threads, menções, anexos); (b) embutir Mattermost; (c) embutir Matrix; (d) apenas integrar com o chat que o time já usa.
 - **Critérios:** esforço, licença compatível com ADR-014, permissões unificadas com `can()`, busca, retenção e LGPD, instalação self-hosted, experiência do usuário.

@@ -1,6 +1,8 @@
-# Decisões arquiteturais (ADRs)
+# Decisões arquiteturais (ADRs) — Vulpes Work
 
-Este índice acompanha [`ADR.md`](ADR.md), que contém o registro completo. As ADRs 001 a 013 foram aprovadas pelo mantenedor em 27/11/2026. A ADR-014 continua pendente de parecer jurídico; as ADRs 015 a 017 não foram aprovadas. Uma decisão aceita só deve ser alterada por meio de uma nova ADR que a substitua.
+Este índice acompanha [`ADR.md`](ADR.md), que contém o registro completo. As ADRs 001 a 013 foram aprovadas pelo mantenedor em 27/11/2026. A ADR-014 continua deliberadamente pendente para decisão antes da Fase 5 ou de publicação externa que exija definição jurídica; as ADRs 015 a 017 não foram aprovadas. Uma decisão aceita só deve ser alterada por meio de uma nova ADR que a substitua.
+
+Fonte de produto: [`../DOCUMENTO_GERAL.md`](../DOCUMENTO_GERAL.md).
 
 ## Índice
 
@@ -19,9 +21,9 @@ Este índice acompanha [`ADR.md`](ADR.md), que contém o registro completo. As A
 | [ADR-011](ADR.md#adr-011--critérios-de-aceite-template-markdown-e-versionamento) | Critérios de aceite em Markdown e versionamento | Aceita | 1 |
 | [ADR-012](ADR.md#adr-012--estados-da-atribuição-e-mapeamento-para-status-do-jira) | Estados da atribuição e mapeamento para Jira | Aceita | 1 |
 | [ADR-013](ADR.md#adr-013--ia-gateway-híbrido-desligado-por-padrão-registro-determinístico) | IA: gateway híbrido e registro determinístico | Aceita | 4 |
-| [ADR-014](ADR.md#adr-014--licença-source-available) | Licença source-available | Pendente (parecer jurídico; direitos reservados provisoriamente) | 0 |
+| [ADR-014](ADR.md#adr-014--licença-e-distribuição) | Licença e distribuição | Pendente (não bloqueia Fase 0; decidir antes da Fase 5/publicação externa) | Antes da Fase 5 |
 | [ADR-015](ADR.md#adr-015--privacidade-retenção-exportação-e-exclusão) | Privacidade, retenção, exportação e exclusão | Proposta | 1 |
-| [ADR-016](ADR.md#adr-016--chat-construir-ou-integrar) | Chat: construir ou integrar | Pendente (spike EP-40) | 3 |
+| [ADR-016](ADR.md#adr-016--chat-construir-ou-integrar) | Chat: construir ou integrar | Pendente (spike/ADR antes do EP-32, Fase 3) | 3 |
 | [ADR-017](ADR.md#adr-017--observabilidade-mínima) | Observabilidade mínima | Proposta | 1 |
 
 ## Significado dos status

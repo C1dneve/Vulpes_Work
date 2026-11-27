@@ -1,8 +1,21 @@
 # Changelog
 
-Mudanças relevantes do Vulpes Hub. A versão `0.1.0` em `pyproject.toml` identifica a baseline do projeto; não representa uma publicação ou release.
+Mudanças relevantes do Vulpes Work. A versão `0.1.0` em `pyproject.toml` identifica a baseline do projeto; não representa uma publicação ou release.
 
 ## Não lançado
+
+### Documentação — revisão V1.2 (27/11/2026)
+- Incorporado `docs/DOCUMENTO_GERAL.md`, cópia canônica do Documento Geral V1.2 aprovado pelo usuário.
+- Reescrito o plano vigente para refletir fases, escopo e decisões V1.2; plano anterior preservado em `docs/plano/arquivo/` como histórico superado.
+- Alinhados README, estado do Development Analytics e índice/registro de ADRs.
+- Criado Prompt Mestre para execução da Fase 0 em clone Git real.
+- Licença e monetização explicitamente adiadas para antes da Fase 5 ou publicação externa que exija definição jurídica; não bloqueiam o fechamento técnico da Fase 0.
+- **Esta atualização altera documentação; não representa implementação de funcionalidades da Fase 0 nem execução nova da suíte.**
+
+### Reexecução da Fase 0 — 27/11/2026
+- `compileall` aprovado e subconjunto de 413 testes aprovado com 85% de cobertura; a suíte completa não coletou por falta de Streamlit após bloqueio de rede no `uv sync`.
+- Ruff, mypy, `pip-audit`, Docker e Gitleaks locais não foram executados por indisponibilidade das ferramentas. A execução remota #14 falhou no job Gitleaks; a causa ainda não pôde ser classificada.
+- A referência exata das 224 asserções não foi encontrada. A Fase 0 permanece aberta; detalhes e evidências estão em `docs/MVP_STATUS.md`.
 
 ### Adicionado
 - Workflow de CI para Python 3.12 e 3.13 com Ruff, mypy, pytest com cobertura, `pip-audit` e Gitleaks.
@@ -39,14 +52,14 @@ Mudanças relevantes do Vulpes Hub. A versão `0.1.0` em `pyproject.toml` identi
 | Spike RLS (27/11/2026) | 6 testes aprovados; ambiente descartável removido após a execução. |
 | Probe Jira (27/11/2026) | 20 issues lidas, 20 sem seção formal de critérios de aceite e nenhuma falha de API. Resultado inconclusivo para medir a precisão do parser. |
 
-Os resultados acima são validações locais reportadas pelo mantenedor. O workflow do GitHub Actions ainda precisa ser executado após o commit e o push.
+Os resultados acima são validações locais reportadas pelo mantenedor. A execução remota #14, em 27/11/2026, ocorreu no commit `40dddf4` e falhou no job Gitleaks; o motivo ainda precisa ser investigado. Os logs não ficaram acessíveis nesta sessão.
 
 ### Pendente antes de encerrar a Fase 0
-- Primeiro resultado verde do GitHub Actions, incluindo Python 3.12 e 3.13 e a varredura do histórico completo.
+- Corrigir e classificar o achado do Gitleaks e obter execução verde do GitHub Actions, incluindo Python 3.12 e 3.13 e a varredura do histórico completo.
 - Comparação com a baseline original para comprovar que as 224 asserções existentes foram preservadas. A suíte atual passou com 440 testes, mas isso, isoladamente, não comprova a comparação histórica.
-- Decisão jurídica sobre titularidade, licença definitiva e política de contribuição (US-03.2 / ADR-014).
-- Adoção de um padrão de critérios de aceite no Jira e nova medição quando houver issues preenchidas nesse formato (US-03.4).
-- Configuração dos checks obrigatórios na proteção da branch `main`, depois da primeira execução válida.
+- Decisão jurídica sobre titularidade, licença definitiva e política de contribuição (ADR-014) antes da Fase 5 ou publicação externa que exija definição; não é bloqueio da Fase 0.
+- Adoção de um padrão de critérios de aceite no Jira e nova medição quando houver issues preenchidas nesse formato (US-03.4); depende do processo da equipe e não bloqueia a Fase 0.
+- Configuração dos checks obrigatórios na proteção da branch principal, depois da primeira execução válida (hardening operacional recomendado).
 
 ## [0.1.0] - 2026-11-26 — baseline do MVP, não publicada
 
