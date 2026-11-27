@@ -44,6 +44,8 @@ def jira_result(settings, mapper):
 def github_result(settings, mapper):
     c1 = gh_commit("c1", "feat(JH-101): implementar validação do cadastro")
     wip = gh_commit("w1", f"wip sem chave {EVIL}", days=1)
+    # Sprint 5 termina em 05/10/2026; use uma data fixa dentro da Sprint, não "ontem".
+    wip["commit"]["author"]["date"] = "2026-10-01T12:00:00Z"
     pr = gh_pr(42, BR_BACK, "c1", title=f"[JH-100] US2.1 — Cadastro {EVIL}")      # PR aberta, sem reviews
     rts = routes([wip], [("main", "w1"), (BR_BACK, "c1")], prs_open=[pr], pr_commits={42: [c1]},
                  compares={f"main...{BR_BACK}": {"ahead_by": 1, "behind_by": 0, "status": "ahead", "commits": [c1]}})

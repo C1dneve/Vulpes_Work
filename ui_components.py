@@ -1,4 +1,4 @@
-"""Tema escuro Moonfoxes + componentes HTML reutilizáveis."""
+"""Tema escuro Vulpes Hub + componentes HTML reutilizáveis."""
 import base64
 from pathlib import Path
 
@@ -132,7 +132,7 @@ def header(atualizado, jira_state, gh_state):
         return (f'<div class="mf-conn"><b>{icone} {esc(nome)}</b>'
                 f'<span style="color:{C[cor]}">● {txt}</span></div>')
     st.markdown(
-        f'<div class="mf-top"><div class="mf-brand"><img src="data:image/png;base64,{logo_b64()}"/><h1>Moonfoxes</h1>'
+        f'<div class="mf-top"><div class="mf-brand"><img src="data:image/png;base64,{logo_b64()}"/><h1>Vulpes Hub</h1>'
         f'<p>Conectando Jira e GitHub<br>para um time mais produtivo.</p></div>'
         f'<div class="mf-right"><div class="mf-conn"><span style="color:{C["green"]}">● Última atualização</span>'
         f'<b>{esc(atualizado)}</b></div>{conn("Jira", jira_state, "◆")}{conn("GitHub", gh_state, "⌥")}</div></div>',
@@ -142,4 +142,4 @@ def header(atualizado, jira_state, gh_state):
 def sidebar_footer():
     return (f'<div style="margin-top:2.5rem"><img src="data:image/png;base64,{logo_b64()}" style="height:70px"/>'
             f'<p class="mf-muted" style="font-size:.95rem;margin-top:.6rem">Grandes resultados<br>nascem de boas<br>conexões.</p>'
-            f'<b style="color:#8B9BFF">Moonfoxes</b></div>')
+            f'<b style="color:#8B9BFF">Vulpes Hub</b></div>')

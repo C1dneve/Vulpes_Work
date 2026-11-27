@@ -1,14 +1,32 @@
 # MVP de acompanhamento de Sprint — estado e regras
 
-Baseline: Moonfoxes **após a correção dos P0** (224 testes). Os P0 foram preservados (ver "Regressões" no final).
-Este documento descreve o que o MVP faz **hoje**, as regras exatas e o que **não** está resolvido.
+A baseline anterior à evolução do MVP tinha 224 testes. A suíte atual passou com 440 testes e cobertura reportada de 85%. A comparação individual das asserções originais com a baseline ainda precisa ser documentada; a contagem maior de testes, por si só, não comprova essa equivalência.
+
+Este documento descreve o que o MVP faz hoje, suas regras, os resultados de validação disponíveis e o que ainda não está resolvido.
+
+## Estado da Fase 0 — 27/11/2026
+
+| Item | Situação |
+|---|---|
+| ADRs 001–013 | Aprovadas formalmente pelo mantenedor. ADR-014 permanece pendente. |
+| Qualidade local | Ruff aprovado; mypy aprovado em 20 arquivos; 440 testes aprovados; cobertura reportada de 85%. |
+| Dependências | `pip-audit` não encontrou vulnerabilidades conhecidas. |
+| Docker | Build e inicialização concluídos; container saudável; processo executado como `uid=10001`. |
+| Configuração | `load_settings()` retornou `ready=True`, sem variáveis obrigatórias ausentes. |
+| Spike RLS | 6 testes aprovados em ambiente PostgreSQL descartável. |
+| Probe de critérios de aceite | 20 issues consultadas, nenhuma falha de API e nenhuma seção formal de critérios de aceite encontrada. Resultado inconclusivo para medir a precisão do parser. |
+| GitHub Actions | Aguardando commit e push para validar o workflow e a matriz Python 3.12/3.13. |
+| Baseline de testes | Comparação das 224 asserções originais com a suíte atual ainda pendente. |
+
+Os resultados locais foram executados pelo mantenedor. Eles não substituem a execução do workflow no GitHub, que também examinará o histórico completo do repositório.
 
 ## Como executar
+O ambiente oficial é reproduzido por `uv.lock` em Python 3.12. Na raiz do projeto:
 ```bash
-pip install -r requirements.txt           # versões fixadas (pandas 2.3.3, streamlit 1.55, plotly 6.6, requests 2.32)
-streamlit run app.py
-pytest -q                                  # suíte completa (inclui o app inteiro com Jira/GitHub simulados)
-python tools/validate_real_apis.py         # validação REAL read-only (usa seu .env local; ver "Validação real")
+uv sync --frozen
+uv run streamlit run app.py
+uv run pytest -q                          # suíte completa (inclui o app inteiro com Jira/GitHub simulados)
+uv run python tools/validate_real_apis.py # validação REAL read-only (usa seu .env local; ver "Validação real")
 ```
 
 ## Telas
@@ -20,7 +38,7 @@ python tools/validate_real_apis.py         # validação REAL read-only (usa seu
 | **Sprint → Tempo em status** | Matriz task × status (Pendente/Andamento/Análise/Teste/Bloqueada) + tempo no status atual; detalhe por task com nomes reais de status |
 | **Agora** | Alertas de severidade alta/média agrupados por tipo; aba com todos os alertas e filtros |
 | **Pessoas** | Visão geral **em ordem alfabética** + detalhe por pessoa (Tarefas, Stories, Horas, Commits, Branches, PRs, Alertas) |
-| **Timeline** | Eventos: issue criada, status alterado, worklog, commit, PR aberta/revisada/mergeada, issue concluída |
+| **Timeline** | Eventos: issue criada, status alterado, worklog, commit, PR aberta/revisada/mergeada, issue concluída; avisos de dados antigos/parciais e limitações ativas das fontes |
 
 ### Filtros globais (Sprint · User Stories · Desenvolvedor)
 Valem para **todas** as telas acima. Regra de design: o filtro de **pessoa** vale para as *linhas* (tasks, alertas, eventos); a **evidência**
@@ -93,14 +111,41 @@ A série vai até hoje (não se projeta escopo futuro constante).
 `issuelinks`, `duedate`, `priority`, eventos `Sprint`/`Flagged` no changelog, status reais) e **t10** (reviews de PR: chaves da listagem, estados e formato de `/pulls/{n}/reviews`).
 O t8 (contagem de chamadas) já exercita o serviço real. Rode na sua máquina (as credenciais ficam no seu `.env`; nada é enviado):
 ```bash
-python tools/validate_real_apis.py --only t9,t10        # só os campos novos
-python tools/validate_real_apis.py --allow-jql-post     # tudo, incluindo o teste de chamadas (libera só POST /search/jql)
+uv run python tools/validate_real_apis.py --only t9,t10        # só os campos novos
+uv run python tools/validate_real_apis.py --allow-jql-post     # tudo, incluindo o teste de chamadas (libera só POST /search/jql)
 ```
 A saída (`tools/validation_output/results.json`) passa por um redator de segredos. Cada campo ausente vira "indisponível" na UI, nunca um valor inventado.
 
+## Probe de critérios de aceite no Jira (US-03.4)
+
+O script `tools/probe_acceptance_criteria.py` consulta até 20 issues usando somente requisições GET e grava um relatório sanitizado em `tools/validation_output/acceptance_criteria.json`. A chave original da issue, a descrição, os nomes de pessoas, os e-mails e os tokens não são gravados no relatório.
+
+Execução utilizada:
+
+```powershell
+uv run python tools/probe_acceptance_criteria.py --jql "project = SCRUM ORDER BY created DESC" --max 20
+```
+
+Resultado informado em 27/11/2026: 20 issues analisadas; `sem_secao=20`, `secao_vazia=0`, `ok=0`, `ok_com_itens_invalidos=0` e `falha_api=0`. Nenhuma das 20 descrições continha a seção formal “Critérios de aceite”.
+
+Esse resultado não demonstra falha do parser: não havia critérios estruturados para ele localizar e comparar. Também não permite calcular precisão ou cobertura. Orientações de implementação (“como fazer”) podem continuar na descrição, mas devem ficar separadas dos critérios que definem o resultado esperado.
+
+Template recomendado para adoção no Jira:
+
+```markdown
+## Critérios de aceite
+- Dado [contexto]
+  Quando [ação]
+  Então [resultado esperado]
+
+## Orientações de implementação
+- [Como fazer, restrições técnicas ou observações]
+```
+
+A medição deve ser repetida quando as issues passarem a usar esse formato.
+
 ## Regressões
-Os P0 continuam cobertos pelos testes originais, **sem alteração de asserções**: Commit → Subtask, Sprint própria da Subtask, Jira Key oficial, `on_main` × `delivered_via_pr`,
-cache (`clear()` ≠ `reset()`) e payload inesperado. Nos arquivos de teste existentes só foram acrescentados *helpers* (rota padrão de `/field` e de `/reviews` nos fakes).
+A suíte atual cobre as regras de vínculo Commit → Subtask, Sprint própria da Subtask, Jira Key oficial, `on_main` × `delivered_via_pr`, cache (`clear()` ≠ `reset()`) e payload inesperado. A execução mais recente passou com 440 testes. Para declarar formalmente que as 224 asserções da baseline original foram preservadas, ainda falta comparar a suíte e os arquivos de teste com o commit de referência anterior à evolução do MVP.
 
 ## Fora do MVP (P1/P2 restantes)
 P1: página Jira ↔ GitHub dedicada; leitura de comentários (motivo de bloqueio); histórico de pontos/estimativas; changelog de Stories; feriados/expediente.

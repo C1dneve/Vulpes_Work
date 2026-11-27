@@ -17,7 +17,7 @@ EVENT_TYPES = [EV_CREATED, EV_STATUS, EV_WORKLOG, EV_COMMIT, EV_PR_OPEN, EV_PR_R
 TL_COLS = ["ts", "date", "type", "key", "title", "person", "detail", "url"]
 
 
-def _ev(ts: object, typ: str, key: str, title: object, person: object, detail: str, url: object = None) -> dict | None:
+def _ev(ts: object, typ: str, key: str, title: object, person: object, detail: str, url: object = None) -> dict[str, object] | None:
     if isna(ts):
         return None
     return {"ts": ts, "type": typ, "key": key, "title": "" if isna(title) else str(title), "person": None if isna(person) else person,
@@ -26,7 +26,7 @@ def _ev(ts: object, typ: str, key: str, title: object, person: object, detail: s
 
 def build_timeline(items: pd.DataFrame, changelog: pd.DataFrame, worklogs: pd.DataFrame, commits: pd.DataFrame,
                    prs: pd.DataFrame) -> pd.DataFrame:
-    rows: list[dict | None] = []
+    rows: list[dict[str, object] | None] = []
     title_of = dict(zip(items["subtask_key"], items["subtask_summary"], strict=True)) if not items.empty else {}
     for _, it in items.iterrows():
         k = it["subtask_key"]

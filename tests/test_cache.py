@@ -127,3 +127,96 @@ def test_unexpected_failure_result_is_not_cached_and_keeps_last_good():
     assert not res.ok and "KeyError" in res.errors[0]
     assert cache.last_good("github").data == 1
     assert cache.get("github", lambda: ok(2), ttl=100).data == 2      # a falha não ficou em cache
+
+
+
+def test_single_flight_shares_one_fetch_across_threads():
+    import threading
+    import time
+
+    cache = SourceCache(wait_timeout=2)
+    started = threading.Event()
+    release = threading.Event()
+    calls = []
+    results = []
+
+    def fetch():
+        calls.append(1)
+        started.set()
+        assert release.wait(1)
+        return ok(42)
+
+    def worker():
+        results.append(cache.get("jira", fetch, ttl=100))
+
+    first = threading.Thread(target=worker)
+    first.start()
+    assert started.wait(1)
+    others = [threading.Thread(target=worker) for _ in range(5)]
+    for thread in others:
+        thread.start()
+    time.sleep(0.05)
+    release.set()
+    first.join(2)
+    for thread in others:
+        thread.join(2)
+    assert len(calls) == 1
+    assert len(results) == 6
+    assert all(result.data == 42 for result in results)
+
+
+def test_fetch_exception_releases_flight_for_next_attempt():
+    cache = SourceCache(wait_timeout=1)
+    calls = []
+
+    def fetch():
+        calls.append(1)
+        if len(calls) == 1:
+            raise RuntimeError("falha simulada")
+        return ok(2)
+
+    try:
+        cache.get("jira", fetch)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("a exceção da primeira busca deveria ser propagada")
+    assert cache.get("jira", fetch).data == 2
+    assert len(calls) == 2
+
+
+def test_wait_timeout_releases_source_for_recovery_without_deadlock():
+    import threading
+
+    cache = SourceCache(wait_timeout=0.05)
+    started = threading.Event()
+    release = threading.Event()
+    first_errors = []
+
+    def slow_fetch():
+        started.set()
+        release.wait(1)
+        return ok(1)
+
+    def first_worker():
+        try:
+            cache.get("jira", slow_fetch)
+        except Exception as exc:  # pragma: no cover - apenas captura para a thread
+            first_errors.append(exc)
+
+    first = threading.Thread(target=first_worker)
+    first.start()
+    assert started.wait(1)
+    try:
+        cache.get("jira", lambda: ok(2), timeout=0.01)
+    except TimeoutError:
+        pass
+    else:
+        raise AssertionError("a espera deveria atingir timeout")
+    # O timeout remove o voo travado do mapa; uma nova chamada assume a fonte.
+    assert cache.get("jira", lambda: ok(3), timeout=0.1).data == 3
+    release.set()
+    first.join(2)
+    assert not first.is_alive()
+    assert first_errors == []
+    assert cache.last_good("jira").data == 3

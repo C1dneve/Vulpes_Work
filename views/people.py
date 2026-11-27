@@ -31,6 +31,8 @@ def _overview(m: Mgmt) -> pd.DataFrame:
 def render(m: Mgmt, domain: str) -> None:
     st.caption("🧭 Esta página serve para **acompanhar o trabalho**, não para comparar pessoas. A tabela está em ordem alfabética e "
                "commits, horas e pontos **não medem valor individual**. Respeita os filtros de Sprint e Stories.")
+    for note in [*m.notes, *m.alert_notes]:
+        st.warning(note)
     if m.people.empty:
         st.info("Nenhuma pessoa com tasks ou worklogs no recorte atual.")
         return

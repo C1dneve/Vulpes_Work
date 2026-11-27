@@ -1,3 +1,6 @@
 -r requirements.txt
 pytest>=8
 ruff>=0.6
+mypy>=1.13
+pytest-cov>=6
+pip-audit>=2.7

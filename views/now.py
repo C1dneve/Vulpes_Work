@@ -8,8 +8,8 @@ import streamlit as st
 
 from domain import alerts as A
 from domain.fmt import NA
-from services.mgmt import Mgmt
 from views import common as V
+from views.context import PageContext
 
 JIRA_KEY = re.compile(r"^[A-Z][A-Z0-9]+-\d+$")
 ACTIONABLE = (A.ALTA, A.MEDIA)
@@ -21,7 +21,7 @@ SECTIONS = [
 
 
 def alerts_frame(a: pd.DataFrame, domain: str) -> pd.DataFrame:
-    def jira(r):
+    def jira(r: pd.Series) -> str | None:
         if r["entity"] in ("subtask", "story") and JIRA_KEY.match(str(r["key"])):
             return V.jira_url(domain, r["key"])
         return V.jira_url(domain, r["story_key"]) if not pd.isna(r["story_key"]) and r["entity"] != "subtask" else None
@@ -37,10 +37,13 @@ def _table(a: pd.DataFrame, domain: str) -> None:
     st.dataframe(alerts_frame(a, domain), hide_index=True, use_container_width=True, column_config=cols)
 
 
-def render(m: Mgmt, domain: str) -> None:
-    for n in [*m.notes, *m.alert_notes]:
+def render(context: PageContext) -> None:
+    management = context.management
+    domain = context.settings.jira.domain
+
+    for n in [*management.notes, *management.alert_notes]:
         st.warning(n)
-    a = m.alerts
+    a = management.alerts
     sev = a["severity"].value_counts().to_dict() if not a.empty else {}
     c = st.columns(4)
     c[0].metric("🔴 Alta", sev.get("alta", 0), help="Exige ação hoje: bloqueada, atrasada, sprint vencida com itens abertos.")
@@ -49,8 +52,8 @@ def render(m: Mgmt, domain: str) -> None:
     c[3].metric("🔵 Info", sev.get("info", 0), help="Registro: concluída/mergeada recentemente, PR aberta sem pendência.")
     t_now, t_all = st.tabs(["⚡ Agora", "📋 Todos os alertas"])
     with t_now:
-        st.caption(f"Itens de severidade alta e média, em ordem de urgência. Limiares: inatividade ≥ {m.th.inactive_business_days} dias úteis · "
-                   f"PR sem revisão ≥ {m.th.pr_review_wait_hours}h · PR antiga ≥ {m.th.pr_old_days}d · prazo 'próximo' ≤ {m.th.due_soon_days}d "
+        st.caption(f"Itens de severidade alta e média, em ordem de urgência. Limiares: inatividade ≥ {management.th.inactive_business_days} dias úteis · "
+                   f"PR sem revisão ≥ {management.th.pr_review_wait_hours}h · PR antiga ≥ {management.th.pr_old_days}d · prazo 'próximo' ≤ {management.th.due_soon_days}d "
                    "(configuráveis em config.json → management).")
         now = a[a["severity"].isin(ACTIONABLE)] if not a.empty else a
         if now.empty:

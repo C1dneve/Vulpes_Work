@@ -1,4 +1,4 @@
-"""Status do Jira -> grupos do Moonfoxes.
+"""Status do Jira -> grupos do Vulpes Hub.
 
 Fluxo do time: A fazer -> Em andamento -> Em análise (Code Review) -> Em teste -> Concluído.
 A classificação usa primeiro a CATEGORIA oficial do Jira (`new` / `indeterminate` / `done`) e só
@@ -32,7 +32,7 @@ _ANDAMENTO = re.compile(r"andamento|progress|\bdoing\b|desenvolv")
 
 
 def classify_status(name: str | None, category: str | None = None) -> str:
-    """Grupo do Moonfoxes para um status do Jira. `category` = `statusCategory.key` quando disponível."""
+    """Grupo do Vulpes Hub para um status do Jira. `category` = `statusCategory.key` quando disponível."""
     n = strip_accents(name).lower().strip()
     if _BLOQUEIO.search(n):
         return BLOQUEADA

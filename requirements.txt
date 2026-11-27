@@ -1,9 +1,10 @@
-# Dependências DIRETAS (as transitivas são resolvidas pelo pip). Versões mantidas as do projeto original.
-streamlit==1.55.0
+# Dependências diretas do projeto. Versões de segurança e compatibilidade autorizadas em 26/11/2026.
+streamlit==1.67.0
 pandas==2.3.3
 plotly==6.6.0
-requests==2.32.5
+requests==2.33.0
 python-dotenv==1.2.2
-pillow==12.1.1
+pillow==13.0.0
 # zoneinfo("America/Sao_Paulo") precisa do banco de fusos; no Windows ele vem deste pacote.
 tzdata==2025.3
+pydantic>=2,<3  # validação tipada de configuração (US-02.4)

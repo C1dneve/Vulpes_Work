@@ -1,12 +1,15 @@
 """Visão da Sprint: Stories (→ Subtasks → Commits; Branch; PR), Burnup e Tempo em status."""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
 from domain import statuses as S
 from domain import time_in_status as TIS
+from domain import timeutil
 from domain.fmt import NA, fmt_duration, fmt_hours, fmt_points
 from domain.linking import branches_for_story, commits_for_item, display_id, prs_for_story, story_level_commits
 from domain.text import md_esc
@@ -69,7 +72,7 @@ def _story_detail(m: Mgmt, sk: str, domain: str) -> None:
     kids = m.items[m.items["story_key"] == sk]
     st.markdown(f"##### 📖 {md_esc(display_id(sk, us))} — {md_esc(s['story_summary'])}")
     st.caption(f"Epic: {md_esc(str(s['epic_summary'] or NA))} · Status no Jira: {s['status_name'] or NA} · Pontos: {fmt_points(s['story_points'])}"
-               f" · Estimado: soma das subtasks (cobertura {s['estimate_coverage']}) · valor CALCULADO pelo Moonfoxes, não pelo Jira.")
+               f" · Estimado: soma das subtasks (cobertura {s['estimate_coverage']}) · valor CALCULADO pelo Vulpes Hub, não pelo Jira.")
     st.markdown("**├── Subtasks** (cada commit só aparece na Subtask cuja chave ele cita)")
     st.dataframe(_subtasks_frame(kids, domain), hide_index=True, use_container_width=True, column_config={"Jira": V.jira_col()})
     for _, t in kids.iterrows():
@@ -196,3 +199,83 @@ def render_time_in_status(m: Mgmt, domain: str) -> None:
                 st.caption("Sem transições no histórico: a task está no status atual desde a criação.")
     if m.tis.unknown:
         st.warning(f"Sem tempo calculado (histórico incompleto ou sem data de criação): {', '.join(sorted(m.tis.unknown))}")
+
+
+def render_git_summary(
+    stories: pd.DataFrame,
+    scoped_items: pd.DataFrame,
+    story_refs: Callable[[str], tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]],
+    summarize_git: Callable[[pd.DataFrame], pd.DataFrame],
+) -> None:
+    """Renderiza o resumo de Git agrupado por User Story no contexto atual."""
+    for _, story in stories.sort_values("story_summary").iterrows():
+        subtasks = scoped_items[scoped_items["story_key"] == story["story_key"]].sort_values("subtask_summary")
+        if subtasks.empty:
+            continue
+        with st.expander(f"📖 {md_esc(story['story_summary'])} — {len(subtasks)} subtasks"):
+            branches, pull_requests, _ = story_refs(story["story_key"])
+            st.caption(
+                f"{display_id(story['story_key'], story['us_id'])} · "
+                f"branches: {len(branches)} · PRs: {len(pull_requests)}"
+            )
+            st.dataframe(summarize_git(subtasks).drop(columns="subtask_key"), hide_index=True, use_container_width=True)
+
+
+def render_burndown(
+    total_items: int,
+    sprint_start: pd.Timestamp | None,
+    sprint_not_started: bool,
+    daily_interval: Callable[[bool], pd.DatetimeIndex],
+    status_series: Callable[[pd.DatetimeIndex], pd.DataFrame],
+) -> None:
+    """Renderiza o Burndown usando o intervalo e a série calculados pela composição do app."""
+    with st.container(border=True):
+        st.markdown("#### 📉 Burndown da meta")
+        st.caption("Linha tracejada = ritmo ideal para zerar a meta até o fim da sprint; "
+                   "linha vermelha = quantas issues realmente faltam, dia a dia.")
+        if sprint_not_started and sprint_start is not None:
+            st.warning(f"⚠️ Segundo as datas do Jira, esta sprint só começa em {sprint_start:%d/%m/%Y} — "
+                       "confira se as datas da sprint no board estão corretas.")
+        days = daily_interval(ate_hoje=False)
+        series = status_series(days)
+        step = total_items / (len(days) - 1) if len(days) > 1 else 0
+        today = timeutil.today()
+        actual = series[series["data"] <= today]
+        if actual.empty:
+            st.info("Nenhum dado real ainda dentro do período da sprint — confira as datas da sprint no Jira.")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=days, y=[max(0, total_items - i * step) for i in range(len(days))], name="Linha ideal",
+                                 line=dict(dash="dash", color=C["gray"]),
+                                 hovertemplate="Ideal: %{y:.1f} restantes em %{x|%d/%m/%Y}<extra></extra>"))
+        fig.add_trace(go.Scatter(x=actual["data"], y=total_items - actual[S.CONCLUIDA], name="Restantes", mode="lines+markers",
+                                 line=dict(color=C["red"], width=3),
+                                 hovertemplate="Restantes: %{y} em %{x|%d/%m/%Y}<extra></extra>"))
+        fig.update_xaxes(title="Data")
+        fig.update_yaxes(title="Issues restantes")
+        st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+
+
+def render_page(
+    management: Mgmt,
+    jira_domain: str,
+    sprint_start: pd.Timestamp | None,
+    sprint_not_started: bool,
+    daily_interval: Callable[[bool], pd.DatetimeIndex],
+    status_series: Callable[[pd.DatetimeIndex], pd.DataFrame],
+    stories: pd.DataFrame,
+    scoped_items: pd.DataFrame,
+    story_refs: Callable[[str], tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]],
+    summarize_git: Callable[[pd.DataFrame], pd.DataFrame],
+) -> None:
+    """Composição da página Sprint: Stories, progresso e tempo em status."""
+    stories_tab, progress_tab, status_tab = st.tabs(["📖 Stories", "📉 Progresso (Burndown e Burnup)", "⏱️ Tempo em status"])
+    with stories_tab:
+        render_stories(management, jira_domain)
+        with st.expander("📋 Resumo Git por Story (visão anterior)"):
+            render_git_summary(stories, scoped_items, story_refs, summarize_git)
+    with progress_tab:
+        render_burndown(len(scoped_items), sprint_start, sprint_not_started, daily_interval, status_series)
+        render_burnup(management)
+    with status_tab:
+        render_time_in_status(management, jira_domain)
+

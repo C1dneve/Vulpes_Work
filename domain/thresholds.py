@@ -1,4 +1,4 @@
-"""Limiares de gestão do Moonfoxes — UM lugar só (nada de números mágicos espalhados pela UI).
+"""Limiares de gestão do Vulpes Hub — UM lugar só (nada de números mágicos espalhados pela UI).
 
 Configuráveis em `config.json` → `management`. Valor inválido cai no padrão e vira aviso em Configurações.
 """

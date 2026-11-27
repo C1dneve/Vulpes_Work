@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    env_file:
+      - path: ./.env
+        required: false
+    volumes:
+      - type: bind
+        source: ./config.json
+        target: /app/config.json
+      - type: bind
+        source: ./.env
+        target: /app/.env
+    restart: unless-stopped

@@ -63,3 +63,78 @@ def test_save_dev_mapping_touches_only_dev_mapping(tmp_path):
     save_dev_mapping(cfg, "Pedro P.", "pedro-pereira-rodrigues")
     out = json.loads(cfg.read_text())
     assert out["dev_mapping"] == {"a": "b", "Pedro P.": "pedro-pereira-rodrigues"} and out["github"]["org"] == "T"
+
+
+
+def test_pydantic_rejects_wrong_config_types_and_keeps_valid_siblings(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({"github": {"org": "Team", "repos": ["repo"], "lookback_days": "90"}}))
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=ENV)
+    assert s.github.org == "Team"
+    assert s.github.repos == ("repo",)
+    assert s.github.lookback_days == 90
+    assert any("github.lookback_days" in problem and "inteiro" in problem for problem in s.problems)
+
+
+def test_pydantic_validates_developer_mapping_shape(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({"github": {"org": "Team", "repos": ["repo"]}, "dev_mapping": ["not-a-map"]}))
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=ENV)
+    assert s.dev_mapping == {}
+    assert any("dev_mapping" in problem for problem in s.problems)
+
+
+def test_environment_type_error_does_not_echo_received_value(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({"github": {"org": "Team", "repos": ["repo"]}}))
+    marker = "SENSITIVE_MARKER_DO_NOT_ECHO"
+    environ = {**ENV, "EMAIL": 123456, "TOKEN": marker}
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=environ)
+    assert "EMAIL" in s.missing_env
+    assert all(marker not in problem for problem in s.problems)
+    assert "123456" not in " ".join(s.problems)
+
+
+def test_missing_optional_configuration_fields_use_defaults(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({"github": {"org": "Team", "repos": ["repo"]}}))
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=ENV)
+    assert s.github.lookback_days == 90
+    assert s.linking.use_jira_key_as_canonical is False
+
+
+def test_obsolete_regex_keys_are_reported_and_ignored(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({
+        "github": {"org": "Team", "repos": ["repo"]},
+        "regex": {"us_summary_pattern": "pattern antigo"},
+    }))
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=ENV)
+    assert any("regex.us_summary_pattern é obsoleto" in problem for problem in s.problems)
+    assert s.linking.jira_key_pattern == r"JH-\d+"
+
+
+def test_configuration_precedence_real_environment_then_env_file_then_json(tmp_path):
+    env_path = tmp_path / ".env"
+    cfg = tmp_path / "config.json"
+    env_path.write_text("GITHUB_ORG=env-file\n")
+    cfg.write_text(json.dumps({"github": {"org": "config-json", "repos": ["repo"]}}))
+
+    real_env = load_settings(env_path=env_path, config_path=cfg, environ={**ENV, "GITHUB_ORG": "real-environment"})
+    env_file = load_settings(env_path=env_path, config_path=cfg, environ=ENV)
+    config_json = load_settings(env_path=tmp_path / "missing.env", config_path=cfg, environ=ENV)
+
+    assert real_env.github.org == "real-environment"
+    assert env_file.github.org == "env-file"
+    assert config_json.github.org == "config-json"
+
+
+def test_invalid_management_threshold_falls_back_with_warning(tmp_path):
+    cfg = tmp_path / "c.json"
+    cfg.write_text(json.dumps({
+        "github": {"org": "Team", "repos": ["repo"]},
+        "management": {"due_soon_days": 0},
+    }))
+    s = load_settings(env_path=tmp_path / ".env", config_path=cfg, environ=ENV)
+    assert s.management.due_soon_days == 2
+    assert any("management.due_soon_days" in problem for problem in s.problems)

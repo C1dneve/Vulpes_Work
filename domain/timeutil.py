@@ -1,4 +1,4 @@
-"""Fuso horário único do Moonfoxes: America/Sao_Paulo (nunca o fuso do servidor).
+"""Fuso horário único do Vulpes Hub: America/Sao_Paulo (nunca o fuso do servidor).
 
 Regra: TODO timestamp que entra no sistema vira tz-aware em `TZ`. Para agrupar por dia usa-se a data
 LOCAL (`local_date`), nunca a data UTC — um commit às 22h em São Paulo é 01h UTC do dia seguinte.
@@ -40,13 +40,13 @@ def today() -> pd.Timestamp:
     return now().tz_localize(None).normalize()
 
 
-def local_date(ts: object) -> pd.Timestamp:
+def local_date(value: object) -> pd.Timestamp:
     """Data local (naive, 00:00) de um Timestamp tz-aware; NaT se não houver valor."""
-    ts = parse_ts(ts) if not isinstance(ts, pd.Timestamp) else ts
+    ts = value if isinstance(value, pd.Timestamp) else parse_ts(value)
     if pd.isna(ts):
         return pd.NaT
-    ts = ts.tz_localize(TZ) if ts.tzinfo is None else ts.tz_convert(TZ)
-    return ts.tz_localize(None).normalize()
+    localized = ts.tz_localize(TZ) if ts.tzinfo is None else ts.tz_convert(TZ)
+    return localized.tz_localize(None).normalize()
 
 
 def local_dates(series: pd.Series) -> pd.Series:
@@ -54,6 +54,6 @@ def local_dates(series: pd.Series) -> pd.Series:
     return series.dt.tz_convert(TZ).dt.tz_localize(None).dt.normalize()
 
 
-def fmt(ts: object, pattern: str = "%d/%m/%Y %H:%M") -> str:
-    ts = parse_ts(ts) if not isinstance(ts, pd.Timestamp) else ts
+def fmt(value: object, pattern: str = "%d/%m/%Y %H:%M") -> str:
+    ts = value if isinstance(value, pd.Timestamp) else parse_ts(value)
     return "" if pd.isna(ts) else ts.strftime(pattern)

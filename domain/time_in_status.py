@@ -30,12 +30,13 @@ class TimeInStatus:
 
 
 def _hours(a: pd.Timestamp, b: pd.Timestamp) -> float:
-    return max((b - a).total_seconds() / 3600, 0.0)
+    seconds = float((b - a).total_seconds())
+    return max(seconds / 3600.0, 0.0)
 
 
 def time_in_status(items: pd.DataFrame, changelog: pd.DataFrame, now: pd.Timestamp,
                    history_unknown: set[str] | frozenset[str] = frozenset()) -> TimeInStatus:
-    rows: list[dict] = []
+    rows: list[dict[str, object]] = []
     unknown: list[str] = []
     by_key = {k: g.sort_values("ts") for k, g in changelog.groupby("subtask_key")} if not changelog.empty else {}
     for _, it in items.iterrows():
@@ -46,7 +47,8 @@ def time_in_status(items: pd.DataFrame, changelog: pd.DataFrame, now: pd.Timesta
         created, evs = it.get("created"), by_key.get(k)
         cur_name = it["status_name"] or "(sem status)"
 
-        def seg(name, group, start, end, current=False, basis="historico", bad=False, _k=k):
+        def seg(name: str, group: str, start: pd.Timestamp, end: pd.Timestamp, current: bool = False,
+                basis: str = "historico", bad: bool = False, _k: str = str(k)) -> None:
             rows.append({"subtask_key": _k, "status": name, "group": group, "start": start, "end": end,
                          "hours": _hours(start, end), "current": current, "basis": basis, "inconsistent": bad})
 

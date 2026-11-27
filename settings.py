@@ -13,12 +13,101 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from dotenv import dotenv_values
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, StrictBool, StrictInt, ValidationError
 
 from domain.thresholds import Thresholds, parse_thresholds
 
 ROOT = Path(__file__).parent
 OBRIGATORIAS = ("EMAIL", "TOKEN", "JIRA_DOMAIN", "BOARD_ID", "JIRA_PROJECT", "GITHUB_TOKEN")
 OBSOLETAS = ("us_summary_pattern", "commit_pattern", "us_format")
+
+
+class _EnvironmentSchema(BaseModel):
+    """Valida os tipos das variáveis sem permitir que segredos apareçam em erros ou reprs."""
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
+    email: str = Field(default="", validation_alias="EMAIL")
+    token: SecretStr = Field(default=SecretStr(""), validation_alias="TOKEN")
+    jira_domain: str = Field(default="", validation_alias="JIRA_DOMAIN")
+    board_id: str = Field(default="", validation_alias="BOARD_ID")
+    jira_project: str = Field(default="", validation_alias="JIRA_PROJECT")
+    github_token: SecretStr = Field(default=SecretStr(""), validation_alias="GITHUB_TOKEN")
+
+
+class _GitHubConfigSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    org: str = ""
+    repos: list[str] = Field(default_factory=list)
+    lookback_days: StrictInt = Field(default=90, gt=0)
+    bot_logins: list[str] = Field(default_factory=list)
+
+
+class _RegexConfigSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    jira_key_pattern: str = ""
+    subtask_summary_pattern: str = ""
+    use_jira_key_as_canonical: StrictBool = False
+
+
+class _JiraConfigSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    story_points_field: str = ""
+
+
+class _ManagementConfigSchema(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    due_soon_days: StrictInt = Field(default=2, gt=0)
+    inactive_business_days: StrictInt = Field(default=2, gt=0)
+    pr_review_wait_hours: StrictInt = Field(default=24, gt=0)
+    pr_old_days: StrictInt = Field(default=5, gt=0)
+    sprint_ending_days: StrictInt = Field(default=2, gt=0)
+    recent_days: StrictInt = Field(default=2, gt=0)
+
+
+class _DevMappingSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mapping: dict[str, str] = Field(default_factory=dict)
+
+
+def _validation_message(error: dict[str, object]) -> str:
+    """Traduz erros de tipo/limite sem incluir o valor recebido (pode ser sensível)."""
+    kind = str(error.get("type", ""))
+    type_messages = {
+        "string_type": "deve ser texto",
+        "dict_type": "deve ser um objeto",
+        "list_type": "deve ser uma lista",
+        "bool_type": "deve ser um booleano",
+        "int_type": "deve ser um inteiro",
+    }
+    if kind in type_messages:
+        return type_messages[kind]
+    if kind in {"greater_than", "greater_than_equal"}:
+        return "deve ser maior que zero"
+    if kind == "extra_forbidden":
+        return "contém um campo não permitido"
+    return "tem um valor inválido"
+
+
+def _validate_section(schema: type[BaseModel], raw: object, name: str, problems: list[str]) -> dict:
+    """Valida campos de uma seção individualmente para manter os campos válidos mesmo se outro falhar."""
+    if raw is None:
+        raw = {}
+    if not isinstance(raw, dict):
+        problems.append(f"{name} deve ser um objeto; usando padrões.")
+        return {}
+    defaults = schema().model_dump()
+    fields = schema.model_fields
+    for key, value in raw.items():
+        if key not in fields:
+            defaults[key] = value
+            continue
+        try:
+            parsed = schema.model_validate({key: value})
+            defaults[key] = getattr(parsed, key)
+        except ValidationError as exc:
+            for issue in exc.errors():
+                field_name = ".".join(str(part) for part in issue.get("loc", (key,)))
+                problems.append(f"{name}.{field_name} {_validation_message(issue)}; usando padrão.")
+    return defaults
 
 
 @dataclass(frozen=True)
@@ -74,8 +163,22 @@ def read_env(env_path: Path, environ: Mapping[str, str] | None = None) -> dict[s
 def load_settings(env_path: Path | None = None, config_path: Path | None = None,
                   environ: Mapping[str, str] | None = None) -> Settings:
     env_path, config_path = env_path or ROOT / ".env", config_path or ROOT / "config.json"
-    env = read_env(env_path, environ)
+    raw_env = read_env(env_path, environ)
     problems: list[str] = []
+
+    # Pydantic valida os tipos das variáveis. Valores não textuais são descartados sem serem exibidos.
+    safe_env = {key: value for key, value in raw_env.items() if isinstance(value, str)}
+    for key, value in raw_env.items():
+        if key in OBRIGATORIAS and not isinstance(value, str):
+            problems.append(f"{key} deve ser texto; variável ignorada.")
+    try:
+        env_model = _EnvironmentSchema.model_validate(safe_env)
+    except ValidationError as exc:
+        # Não usar str(exc) nem errors() diretamente: ambos podem conter o valor recebido.
+        for issue in exc.errors():
+            loc = str(issue.get("loc", ["variável"])[0]).upper()
+            problems.append(f"{loc} {_validation_message(issue)}.")
+        env_model = _EnvironmentSchema()
 
     try:
         cfg = json.loads(config_path.read_text(encoding="utf-8"))
@@ -86,17 +189,27 @@ def load_settings(env_path: Path | None = None, config_path: Path | None = None,
         cfg = {}
         problems.append(f"{config_path.name} inválido (linha {e.lineno}): {e.msg}")
 
-    gh, rx = cfg.get("github") or {}, cfg.get("regex") or {}
-    project = env.get("JIRA_PROJECT", "")
-    org = env.get("GITHUB_ORG") or gh.get("org", "")
+    if not isinstance(cfg, dict):
+        problems.append(f"{config_path.name} deve conter um objeto JSON na raiz; usando padrões.")
+        cfg = {}
+
+    gh = _validate_section(_GitHubConfigSchema, cfg.get("github"), "github", problems)
+    rx = _validate_section(_RegexConfigSchema, cfg.get("regex"), "regex", problems)
+    jira_cfg = _validate_section(_JiraConfigSchema, cfg.get("jira"), "jira", problems)
+
+    project = env_model.jira_project
+    org = safe_env.get("GITHUB_ORG") or gh.get("org", "")
     repos = tuple(gh.get("repos") or ())
     if not org:
         problems.append("Organização do GitHub não definida (config.json → github.org ou GITHUB_ORG).")
     if not repos:
         problems.append("Nenhum repositório em config.json → github.repos.")
+
     lookback = gh.get("lookback_days", 90)
-    if not isinstance(lookback, int) or lookback <= 0:
-        problems.append("github.lookback_days deve ser um inteiro > 0; usando 90.")
+    # Compatibilidade defensiva caso uma versão antiga do JSON tenha tipos inesperados.
+    if isinstance(lookback, bool) or not isinstance(lookback, int) or lookback <= 0:
+        if not any(p.startswith("github.lookback_days") for p in problems):
+            problems.append("github.lookback_days deve ser um inteiro maior que 0; usando 90.")
         lookback = 90
 
     key_pattern = rx.get("jira_key_pattern") or (rf"{re.escape(project)}-\d+" if project else "")
@@ -106,30 +219,49 @@ def load_settings(env_path: Path | None = None, config_path: Path | None = None,
             re.compile(pat)
         except re.error as e:
             problems.append(f"{label} não é uma regex válida: {e}")
-            key_pattern = key_pattern if label != "regex.jira_key_pattern" else ""
+            if label == "regex.jira_key_pattern":
+                key_pattern = ""
+            else:
+                subtask_pattern = LinkSettings.subtask_pattern
     for k in OBSOLETAS:
         if k in rx:
             problems.append(f"regex.{k} é obsoleto e foi ignorado (regra de vínculo agora é central e testada).")
 
-    jira_cfg = cfg.get("jira") or {}
-    sp_field = jira_cfg.get("story_points_field") or "" if isinstance(jira_cfg, dict) else ""
+    sp_field = jira_cfg.get("story_points_field") or ""
     if sp_field and not re.fullmatch(r"customfield_\d+", str(sp_field)):
         problems.append("jira.story_points_field deve ser um id como customfield_10016; será descoberto automaticamente.")
         sp_field = ""
-    management = parse_thresholds(cfg.get("management"), problems)
 
-    mapping = cfg.get("dev_mapping") or {}
-    if not isinstance(mapping, dict):
-        problems.append("dev_mapping deve ser um objeto {login_github: slug_jira}.")
+    management_cfg = _validate_section(_ManagementConfigSchema, cfg.get("management"), "management", problems)
+    management = parse_thresholds(management_cfg, problems)
+
+    raw_mapping = cfg.get("dev_mapping") or {}
+    try:
+        mapping = _DevMappingSchema.model_validate({"mapping": raw_mapping}).mapping
+    except ValidationError as exc:
+        for issue in exc.errors():
+            problems.append(f"dev_mapping deve ser um objeto de texto para texto ({_validation_message(issue)}); usando vazio.")
         mapping = {}
 
+    # Remove mensagens repetidas que podem surgir da validação Pydantic + compatibilidade legada.
+    problems = list(dict.fromkeys(problems))
+    env_values = {
+        "EMAIL": env_model.email,
+        "TOKEN": env_model.token.get_secret_value(),
+        "JIRA_DOMAIN": env_model.jira_domain,
+        "BOARD_ID": env_model.board_id,
+        "JIRA_PROJECT": env_model.jira_project,
+        "GITHUB_TOKEN": env_model.github_token.get_secret_value(),
+    }
+    missing_env = tuple(key for key in OBRIGATORIAS if not env_values.get(key, "").strip())
+
     return Settings(
-        jira=JiraSettings(env.get("EMAIL", ""), env.get("TOKEN", ""), env.get("JIRA_DOMAIN", ""),
-                          env.get("BOARD_ID", ""), project, str(sp_field)),
-        github=GitHubSettings(env.get("GITHUB_TOKEN", ""), org, repos, lookback, tuple(gh.get("bot_logins") or ())),
+        jira=JiraSettings(env_values["EMAIL"], env_values["TOKEN"], env_values["JIRA_DOMAIN"],
+                          env_values["BOARD_ID"], env_values["JIRA_PROJECT"], str(sp_field)),
+        github=GitHubSettings(env_values["GITHUB_TOKEN"], str(org), repos, lookback, tuple(gh.get("bot_logins") or ())),
         linking=LinkSettings(key_pattern, subtask_pattern, bool(rx.get("use_jira_key_as_canonical", False))),
         dev_mapping=dict(mapping), config_path=config_path, env_path=env_path,
-        missing_env=tuple(v for v in OBRIGATORIAS if not env.get(v)), problems=tuple(problems), management=management,
+        missing_env=missing_env, problems=tuple(problems), management=management,
     )
 
 

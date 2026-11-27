@@ -1,11 +1,12 @@
 """Regras de gestão de uma task/story (funções puras): prazo, esforço, bloqueio, inatividade, lado BE/FE.
 
-Princípios: ausente continua ausente (`None`), nunca vira 0; valor calculado pelo Moonfoxes é sempre rotulado como tal;
+Princípios: ausente continua ausente (`None`), nunca vira 0; valor calculado pelo Vulpes Hub é sempre rotulado como tal;
 `now`/`today` são parâmetros (testável e sem depender do relógio).
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
+from numbers import Real
 
 import numpy as np
 import pandas as pd
@@ -54,11 +55,18 @@ class Effort:
     remaining_source: str | None    # "jira" (timeestimate) | "calculado" (estimado − registrado, mín. 0) | None (sem base)
 
 
+def _number(value: object) -> float | None:
+    if isna(value) or not isinstance(value, Real):
+        return None
+    return float(value)
+
+
 def effort(estimate_h: object, logged_h: object, remaining_h: object) -> Effort:
-    est = None if isna(estimate_h) else float(estimate_h)
-    log = None if isna(logged_h) else float(logged_h)
-    if not isna(remaining_h):
-        rem, src = float(remaining_h), "jira"
+    est = _number(estimate_h)
+    log = _number(logged_h)
+    jira_remaining = _number(remaining_h)
+    if jira_remaining is not None:
+        rem, src = jira_remaining, "jira"
     elif est is not None:
         rem, src = max(est - (log or 0.0), 0.0), "calculado"
     else:
@@ -66,8 +74,8 @@ def effort(estimate_h: object, logged_h: object, remaining_h: object) -> Effort:
     return Effort(est, log, None if est is None or log is None else log - est, rem, src)
 
 
-def rollup_effort(items: pd.DataFrame) -> dict:
-    """Soma das Subtasks de uma Story (valor CALCULADO pelo Moonfoxes). Subtask sem estimativa não entra como 0:
+def rollup_effort(items: pd.DataFrame) -> dict[str, object]:
+    """Soma das Subtasks de uma Story (valor CALCULADO pelo Vulpes Hub). Subtask sem estimativa não entra como 0:
     `estimate_coverage` diz quantas têm estimativa ('3/5') e a soma é None se nenhuma tiver."""
     n = len(items)
     est = items["estimate_h"].dropna() if n else pd.Series(dtype=float)

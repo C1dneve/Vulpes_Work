@@ -14,6 +14,7 @@ Evidência de uma SUBTASK = commit que cita a chave DELA (regra P0). PR/branch s
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
 
 import pandas as pd
 
@@ -50,7 +51,7 @@ class AlertReport:
 
 
 def _alert(rule: str, severity: str, entity: str, key: str, title: object, owners: list[str], detail: str,
-           since: object = pd.NaT, story_key: str | None = None, url: str | None = None) -> dict:
+           since: object = pd.NaT, story_key: str | None = None, url: str | None = None) -> dict[str, object]:
     return {"rule": rule, "severity": severity, "source": RULES[rule][1], "entity": entity, "key": key, "story_key": story_key,
             "title": "" if isna(title) else str(title), "owners": sorted({o for o in owners if o and o != "nenhum"}),
             "detail": detail, "since": since, "url": url}
@@ -85,10 +86,10 @@ def _story_prs(prs: pd.DataFrame, story: pd.Series | None, sk: str, children: se
 
 def build_alerts(items_e: pd.DataFrame, stories: pd.DataFrame, all_items: pd.DataFrame, commits: pd.DataFrame, prs: pd.DataFrame, *,
                  known_keys: set[str], now: pd.Timestamp, th: Thresholds, github_ok: bool = True,
-                 github_since: pd.Timestamp | None = None, sprint: dict | None = None) -> AlertReport:
+                 github_since: pd.Timestamp | None = None, sprint: dict[str, Any] | None = None) -> AlertReport:
     """`items_e` = tasks enriquecidas (`sprint_view.enrich_items`); `commits`/`prs` = SPRINT inteira, sem filtro de pessoa.
     `sprint` = {'name','end','state'} quando UMA sprint está selecionada (senão a regra de fim de sprint não se aplica)."""
-    rows: list[dict] = []
+    rows: list[dict[str, object]] = []
     notes: list[str] = []
     today = now.tz_localize(None).normalize()
     sby = {r["story_key"]: r for _, r in stories.iterrows()} if not stories.empty else {}
@@ -208,7 +209,13 @@ def build_alerts(items_e: pd.DataFrame, stories: pd.DataFrame, all_items: pd.Dat
     return AlertReport(df, notes)
 
 
-def _merged_but_open(items_e: pd.DataFrame, prs: pd.DataFrame, stories: pd.DataFrame, known: set[str], now: pd.Timestamp) -> list[dict]:
+def _merged_but_open(
+    items_e: pd.DataFrame,
+    prs: pd.DataFrame,
+    stories: pd.DataFrame,
+    known: set[str],
+    now: pd.Timestamp,
+) -> list[dict[str, object]]:
     """PR mergeada na branch padrão + Subtasks do MESMO lado ainda em andamento no Jira (e sem outra PR aberta do lado)."""
     if items_e.empty:
         return []

@@ -15,6 +15,8 @@ from views.now import JIRA_KEY
 def render(m: Mgmt, domain: str) -> None:
     st.caption("Primeira visão cronológica da Sprint, montada com o que o Jira e o GitHub fornecem. Não é uma reconstrução perfeita: "
                "revisor e o momento em que a PR saiu de rascunho não são coletados. " + V.tz_note())
+    for note in [*m.notes, *m.alert_notes]:
+        st.warning(note)
     tl = m.timeline
     if tl.empty:
         st.info("Nenhum evento no recorte atual.")

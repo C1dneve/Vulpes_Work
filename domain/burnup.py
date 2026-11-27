@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from bisect import bisect_right
 from dataclasses import dataclass, field
+from typing import Any
 
 import pandas as pd
 
@@ -32,20 +33,20 @@ class Burnup:
     changes: pd.DataFrame                  # entradas/saídas de escopo APÓS o início da sprint
     sp_available: bool = False
     sp_missing: int = 0                    # Stories no escopo sem Story Points (fora da soma)
-    basis: dict = field(default_factory=dict)       # {"events": n, "approx": n}
+    basis: dict[str, int] = field(default_factory=dict)       # {"events": n, "approx": n}
     undated_done: list[str] = field(default_factory=list)   # concluídas sem data confiável (não entram no 'concluído')
     notes: list[str] = field(default_factory=list)
 
 
-def _matches(ids: list, names: list, sprint: dict) -> bool:
+def _matches(ids: list[Any], names: list[Any], sprint: dict[str, Any]) -> bool:
     return (sprint.get("id") is not None and str(sprint["id"]) in [str(i) for i in ids]) or sprint["name"] in names
 
 
-def _mentions(e: pd.Series, sprint: dict) -> bool:
+def _mentions(e: pd.Series, sprint: dict[str, Any]) -> bool:
     return _matches(e["from_ids"], e["from_names"], sprint) or _matches(e["to_ids"], e["to_names"], sprint)
 
 
-def _membership(item: pd.Series, events: pd.DataFrame, sprint: dict, start: pd.Timestamp, end_carry: pd.Timestamp | None,
+def _membership(item: pd.Series, events: pd.DataFrame, sprint: dict[str, Any], start: pd.Timestamp, end_carry: pd.Timestamp | None,
                 ) -> tuple[list[tuple[pd.Timestamp, pd.Timestamp | None]], str]:
     """Intervalos [entrada, saída) de pertencimento à sprint (datas locais) e a base ('events' | 'approx')."""
     created = timeutil.local_date(item.get("created"))
@@ -53,25 +54,26 @@ def _membership(item: pd.Series, events: pd.DataFrame, sprint: dict, start: pd.T
     mentions = [e for _, e in events.iterrows() if _mentions(e, sprint)]
     if not mentions:
         return [(base_start, None)], "approx"
-    intervals: list[list] = []
+    intervals: list[tuple[pd.Timestamp, pd.Timestamp | None]] = []
     cur = _matches(events.iloc[0]["from_ids"], events.iloc[0]["from_names"], sprint)
     if cur:
-        intervals.append([base_start, None])
+        intervals.append((base_start, None))
     for _, e in events.sort_values("ts").iterrows():
         after = _matches(e["to_ids"], e["to_names"], sprint)
         d = max(e["date"], start) if not isna(e["date"]) else start
         if after and not cur:
-            intervals.append([d, None])
+            intervals.append((d, None))
         elif cur and not after:
             if end_carry is not None and e["date"] >= end_carry:
                 pass                                   # carry-over de fim de sprint: continua contando como escopo
             elif intervals:
-                intervals[-1][1] = d
+                interval_start, _ = intervals[-1]
+                intervals[-1] = (interval_start, d)
         cur = after
     return [(a, b) for a, b in intervals], "events"
 
 
-def _group_timeline(evs: pd.DataFrame, item: pd.Series) -> tuple[str | None, list, list]:
+def _group_timeline(evs: pd.DataFrame, item: pd.Series) -> tuple[str | None, list[Any], list[Any]]:
     """(grupo inicial, datas das transições, grupos de destino) — calculado UMA vez por task (None = desconhecido)."""
     if evs.empty:
         if item["status_group"] != S.CONCLUIDA:
@@ -81,14 +83,14 @@ def _group_timeline(evs: pd.DataFrame, item: pd.Series) -> tuple[str | None, lis
     return evs.iloc[0]["from_group"], list(evs["date"]), list(evs["to_group"])
 
 
-def _group_on(day: pd.Timestamp, tl: tuple[str | None, list, list]) -> str | None:
+def _group_on(day: pd.Timestamp, tl: tuple[str | None, list[Any], list[Any]]) -> str | None:
     """Grupo de status da task ao FIM de `day`."""
     initial, dates, groups = tl
     i = bisect_right(dates, day)
     return initial if i == 0 else groups[i - 1]
 
 
-def burnup(items: pd.DataFrame, stories: pd.DataFrame, changelog: pd.DataFrame, sprint_events: pd.DataFrame, sprint: dict,
+def burnup(items: pd.DataFrame, stories: pd.DataFrame, changelog: pd.DataFrame, sprint_events: pd.DataFrame, sprint: dict[str, Any],
            now: pd.Timestamp, *, story_keys: set[str] | None = None, assignee: str | None = None) -> Burnup:
     """`items`/`stories`/`changelog`/`sprint_events` = frames BRUTOS (não filtrados pela sprint: quem saiu dela continua visível)."""
     empty = Burnup(pd.DataFrame(columns=DAY_COLS), pd.DataFrame(columns=CHANGE_COLS))
@@ -117,9 +119,9 @@ def burnup(items: pd.DataFrame, stories: pd.DataFrame, changelog: pd.DataFrame, 
         cand = cand[cand["assignee"] == assignee]
 
     days = pd.date_range(start, last, freq="D")
-    mem: dict[str, list] = {}
+    mem: dict[str, list[tuple[pd.Timestamp, pd.Timestamp | None]]] = {}
     basis = {"events": 0, "approx": 0}
-    changes: list[dict] = []
+    changes: list[dict[str, object]] = []
     for _, it in cand.iterrows():
         k = it["subtask_key"]
         iv, how = _membership(it, ev_by.get(k, sprint_events.iloc[0:0]), sprint, start, carry_from)

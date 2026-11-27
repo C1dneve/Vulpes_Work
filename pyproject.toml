@@ -1,6 +1,34 @@
+[project]
+name = "vulpes-hub"
+version = "0.1.0"
+description = "Dashboard Streamlit para acompanhamento integrado de Jira e GitHub."
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit==1.67.0",
+    "pandas==2.3.3",
+    "plotly==6.6.0",
+    "requests==2.33.0",
+    "python-dotenv==1.2.2",
+    "pillow==13.0.0",
+    "tzdata==2025.3",
+    "pydantic>=2,<3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+    "mypy>=1.13",
+    "pytest-cov>=6",
+    "pip-audit>=2.7",
+]
+
+[tool.uv]
+package = false
+
 [tool.ruff]
 line-length = 140
-target-version = "py310"
+target-version = "py312"
 extend-exclude = ["venv", ".venv"]
 
 [tool.ruff.lint]
@@ -11,10 +39,32 @@ ignore = ["E731", "E701", "E702", "B008", "E741"]   # estilo compacto já usado 
 "tests/*" = ["E501", "B011"]
 "app.py" = ["E501"]            # HTML/CSS e f-strings longos; legibilidade > limite de colunas
 "ui_components.py" = ["E501"]
-"tools/*.py" = ["E501"]         # ferramenta de diagnóstico com saídas longas
+"tools/*.py" = ["E501"]         # ferramentas com saídas longas
 "views/*.py" = ["E501"]         # telas Streamlit: mesma política de app.py/ui_components.py
 "services/*.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+markers = [
+    "spike: testes isolados de provas de conceito, fora da suíte padrão",
+]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["domain.*"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["application.*", "contracts.*"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["services.context", "services.mgmt", "services.jira", "services.github", "settings"]
+follow_imports = "silent"

@@ -17,3 +17,15 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# arquivos de ambiente: manter apenas o exemplo versionável
+.env.*
+!.env.example
+
+# saídas reais de validação (somente exemplos e instruções são versionáveis)
+tools/validation_output/*
+!tools/validation_output/README.md
+!tools/validation_output/results.example.json
+
+# logs locais
+*.log

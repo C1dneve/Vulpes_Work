@@ -1,0 +1,26 @@
+# Segredos e arquivos locais
+.env
+.env.*
+!.env.example
+.git
+
+# Ambientes, caches e ferramentas locais
+.venv
+venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+htmlcov
+
+# Saídas reais e artefatos de diagnóstico
+tools/validation_output
+*.log
+*.zip
+
+# Editor e sistema
+.DS_Store
+.idea
+.vscode

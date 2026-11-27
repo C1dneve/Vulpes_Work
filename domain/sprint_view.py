@@ -122,7 +122,7 @@ def enrich_stories(stories: pd.DataFrame, items_e: pd.DataFrame, all_items: pd.D
     return pd.DataFrame(rows, columns=cols)
 
 
-def sprint_kpis(stories_e: pd.DataFrame, items_e: pd.DataFrame) -> dict:
+def sprint_kpis(stories_e: pd.DataFrame, items_e: pd.DataFrame) -> dict[str, int | float | None]:
     """Números da Sprint. Story Points: só das Stories que TÊM pontos; `sp_missing` diz quantas não têm (nunca conta como 0)."""
     with_sp = stories_e["story_points"].dropna() if not stories_e.empty else pd.Series(dtype=float)
     done = stories_e[stories_e["status_group"] == S.CONCLUIDA] if not stories_e.empty else stories_e

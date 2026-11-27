@@ -1,0 +1,339 @@
+{
+  "t1": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "mecanismo": "example",
+    "pagina1": [
+      "example"
+    ],
+    "pagina2": [
+      "example"
+    ],
+    "meta1": {
+      "startAt": 0,
+      "maxResults": 0,
+      "total": 0,
+      "isLast": null
+    },
+    "meta2": {
+      "startAt": 0,
+      "maxResults": 0,
+      "total": 0,
+      "isLast": null
+    },
+    "teto": {
+      "maxResults_ecoado": 0,
+      "retornados": 0
+    },
+    "chaves_topo": [
+      "PROJ-1"
+    ]
+  },
+  "t2": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "amostra": 0,
+    "cobertura": {
+      "epic": {
+        "null": 0
+      },
+      "closedSprints": {
+        "preenchido": 0,
+        "ausente": 0
+      },
+      "sprint": {
+        "null": 0,
+        "preenchido": 0
+      },
+      "issuetype": {
+        "preenchido": 0
+      },
+      "status": {
+        "preenchido": 0
+      },
+      "flagged": {
+        "preenchido": 0
+      }
+    },
+    "estrutura": {
+      "epic": "example",
+      "closedSprints": "example",
+      "sprint": "example",
+      "issuetype": "PROJ-1",
+      "status": "exemplo",
+      "flagged": "example"
+    },
+    "tipos": {
+      "História": 0,
+      "Epic": 0,
+      "Subtask": 0
+    },
+    "sprint_estados": {
+      "sem sprint": 0,
+      "future": 0
+    },
+    "closed_exemplo": {
+      "issue": "PROJ-1",
+      "presente": {
+        "id": false,
+        "name": false,
+        "state": false,
+        "startDate": false,
+        "endDate": false,
+        "completeDate": false
+      },
+      "n_issues": 0
+    },
+    "sprints_encerradas_no_board": 0,
+    "epic": {
+      "via_epic": 0,
+      "via_parent": 0,
+      "de": 0,
+      "estrutura": null
+    }
+  },
+  "t3": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "pagina1": {
+      "issue": "PROJ-1",
+      "total": 0,
+      "startAt": 0,
+      "maxResults": 0,
+      "retornados": 0,
+      "chaves": [
+        "PROJ-1"
+      ]
+    }
+  },
+  "t4": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "pagina1": {
+      "issue": "PROJ-1",
+      "total": 0,
+      "startAt": 0,
+      "maxResults": 0,
+      "isLast": false,
+      "retornados": 0,
+      "chaves": [
+        "PROJ-1"
+      ],
+      "chaves_item": [
+        "PROJ-1"
+      ]
+    },
+    "pagina2": {
+      "issue": "PROJ-1",
+      "total": 0,
+      "startAt": 0,
+      "maxResults": 0,
+      "retornados": 0
+    }
+  },
+  "t9": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "story_points": {
+      "customfield_10016": {
+        "stories": "example",
+        "subtasks": "example"
+      }
+    },
+    "flagged_fields": [
+      "example"
+    ],
+    "board_estimation": "example",
+    "cobertura": {
+      "duedate": {
+        "preenchido": 0,
+        "null": 0
+      },
+      "priority": {
+        "preenchido": 0
+      },
+      "issuelinks": {
+        "vazio": 0
+      },
+      "flagged (boolean do agile)": {
+        "preenchido": 0
+      }
+    },
+    "links_bloqueio": 0,
+    "changelog_fields": {
+      "IssueParentAssociation": 0,
+      "summary": 0,
+      "priority": 0,
+      "Start date": 0,
+      "Sprint": 0,
+      "Story point estimate": 0,
+      "status": 0,
+      "resolution": 0,
+      "duedate": 0,
+      "Classificação": 0,
+      "assignee": 0,
+      "Link": 0,
+      "Issue color": 0,
+      "Epic Color": 0
+    },
+    "evento_sprint": {
+      "from": "example",
+      "to": "example",
+      "fromString": "example",
+      "toString": "example"
+    }
+  },
+  "t5": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "resultados": [
+      {
+        "branch": "feature/example",
+        "variantes": [
+          {
+            "variante": "example",
+            "http": 0,
+            "erro": null,
+            "status": "exemplo",
+            "ahead_by": 0,
+            "behind_by": 0,
+            "total_commits": 0,
+            "commits_na_pagina": 0,
+            "mensagem": null,
+            "url_enviada": "https://example.invalid/resource"
+          }
+        ]
+      }
+    ]
+  },
+  "t6": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "examinados": 0
+  },
+  "t7": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "contagem": {
+      "merge": 0,
+      "rebase_compat": 0,
+      "squash_compat": 0,
+      "ambiguo": 0
+    },
+    "prs": [
+      {
+        "pr": 0,
+        "classe": "example",
+        "observado": [
+          "example"
+        ],
+        "inferencia": [
+          "example"
+        ]
+      }
+    ],
+    "metodos_habilitados": {
+      "allow_merge_commit": null,
+      "allow_squash_merge": null,
+      "allow_rebase_merge": null
+    }
+  },
+  "t10": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "chaves_listagem": {
+      "requested_reviewers": false,
+      "requested_teams": false,
+      "draft": false,
+      "merged_at": false,
+      "user": false
+    },
+    "estados_review": {
+      "APPROVED": 0
+    },
+    "amostra": [
+      {
+        "pr": 0,
+        "estado_pr": "example",
+        "reviews": 0,
+        "chaves_review": [
+          "PROJ-1"
+        ],
+        "tipo_usuario": "example",
+        "submitted_at": false
+      }
+    ]
+  },
+  "t8": {
+    "status": "exemplo",
+    "evidence": "Conteúdo fictício para documentação.",
+    "jira": 0,
+    "github": 0,
+    "total": 0,
+    "secs": 0.0,
+    "por_endpoint": {
+      "Jira": {
+        "GET /rest/agile/1.0/board/{board}/sprint": 0,
+        "GET /rest/api/3/field": 0,
+        "GET /rest/agile/1.0/board/{board}/issue": 0,
+        "GET /rest/api/3/issue/{key}/changelog": 0
+      },
+      "GitHub": {
+        "GET /repos/{org}/{repo}": 0,
+        "GET /repos/{org}/{repo}/branches": 0,
+        "GET /repos/{org}/{repo}/pulls": 0,
+        "GET /repos/{org}/{repo}/commits": 0,
+        "GET /repos/{org}/{repo}/pulls/{n}/commits": 0,
+        "GET /repos/{org}/{repo}/pulls/{n}/reviews": 0,
+        "GET /repos/{org}/{repo}/compare/{basehead}": 0
+      }
+    },
+    "status_http": {
+      "Jira 200": 0,
+      "GitHub 200": 0
+    },
+    "cota_consumida_estimada": 0,
+    "menor_restante_visto": 0,
+    "notas": [],
+    "execucoes": {
+      "jira": {
+        "secs": 0.0,
+        "status": "exemplo",
+        "stats": {
+          "issues": 0,
+          "stories": 0,
+          "items": 0,
+          "worklogs": 0,
+          "changelog": 0,
+          "sprints": 0,
+          "worklog_partial": [],
+          "changelog_partial": [],
+          "story_points_field": "example",
+          "api_calls": 0
+        },
+        "warnings": [],
+        "errors": [],
+        "http_calls_attr": 0
+      },
+      "github": {
+        "secs": 0.0,
+        "status": "exemplo",
+        "stats": {
+          "commits": 0,
+          "branches": 0,
+          "prs": 0,
+          "lookback_days": 0,
+          "api_calls": 0,
+          "rate_remaining": 0.0,
+          "repos": [
+            "example-repo"
+          ]
+        },
+        "warnings": [],
+        "errors": [],
+        "http_calls_attr": 0
+      }
+    },
+    "bloqueadas": {}
+  }
+}

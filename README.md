@@ -1,126 +1,127 @@
-# 🦊 Moonfoxes — Dashboard Jira + GitHub
+# Vulpes Hub
 
-Dashboard em Streamlit que cruza as **issues do Jira** com os **commits do GitHub** — em todas as branches e na main.
+Dashboard em Streamlit que reúne informações do Jira e do GitHub para acompanhar sprints, issues, branches, commits e Pull Requests.
 
-## O que ele faz
-- **Dashboard**: KPIs da sprint, progresso diário, distribuição por status, últimas issues e últimos commits.
-- **Commits**: todos os commits de todas as branches, com *em quais branches estão*, se **já estão na main** ou só em branch, PRs e commits sem vínculo com o Jira.
-- **Por task**: cruza Jira × GitHub e alerta divergências (ex.: task *Concluída* sem commit na main).
-- **Sprint / Issues / Relatórios**: burndown, hierarquia US → subtasks, horas por tag, esforço por dev. Nos gráficos de
-  Relatórios, clique numa barra/ponto de uma pessoa para abrir os detalhes dela (tasks, horas, commits, branches).
-- **Configurações**: confere o `.env`, testa as conexões e mostra o debug de mapeamento.
+## Funcionalidades
 
-### MVP de acompanhamento de Sprint (novo)
-- **Sprint → Stories**: por Story, responsável, status do Jira, Story Points, estimado × registrado, prazo, branches, PRs e commits, com a hierarquia
-  *Story → Subtasks → Commits* e, em paralelo, *Story → Branch → PR*. Abas de **Burndown/Burnup** e **Tempo em status**.
-- **Agora**: o que exige atenção neste momento (bloqueadas, atrasadas, inativas, PRs aguardando revisão, inconsistências Jira ↔ GitHub) + todos os alertas.
-- **Pessoas**: o trabalho de cada pessoa (tarefas, Stories, horas, commits, branches, PRs). **Sem ranking.**
-- **Timeline**: eventos cronológicos da Sprint (criação, status, worklog, commit, PR aberta/revisada/mergeada, conclusão).
+- **Dashboard:** indicadores da sprint, andamento diário, distribuição por status e atividade recente.
+- **Sprint:** Stories, subtarefas, estimativas, horas registradas, Story Points, branches, PRs, burndown, burnup e tempo em status.
+- **Agora:** alertas de bloqueio, atraso, inatividade e pendências de revisão.
+- **Pessoas:** visão do trabalho por colaborador, sem ranking ou pontuação de produtividade.
+- **Timeline:** eventos de Jira e GitHub em ordem cronológica.
+- **Commits e relatórios:** rastreabilidade entre issues, commits, branches e Pull Requests.
+- **Configurações:** validação das conexões, sincronização e mapeamento de autores.
 
-Detalhes, regras, limiares e limitações conhecidas: **[`docs/MVP_STATUS.md`](docs/MVP_STATUS.md)**.
+As regras de negócio, os limites conhecidos e o estado funcional estão em [`docs/MVP_STATUS.md`](docs/MVP_STATUS.md).
 
-## Convenções do time (Jira ↔ GitHub)
+## Arquitetura
 
-Modelo oficial: **Branch = User Story · PR = User Story · Commit = Subtask**.
+O projeto é um monólito modular. As responsabilidades ficam separadas por camada:
 
-| Item | Convenção | Exemplo |
-|---|---|---|
-| Branch (uma por lado) | `feature/{backend ou frontend}/{CHAVE}-{USx.y}-{slug}` | `feature/backend/JH-123-US2.1-cadastro` |
-| Commit | `tipo(CHAVE-DA-SUBTASK): descrição real da alteração` | `feat(JH-101): implementar validação do cadastro de cliente` |
-| Pull Request | `[CHAVE-DA-STORY] USx.y — Título` | `[JH-123] US2.1 — Cadastro de cliente` |
+| Diretório ou arquivo | Responsabilidade |
+|---|---|
+| `domain/` | Regras de negócio independentes de Streamlit, Jira, GitHub e banco de dados. |
+| `services/` | Integrações com Jira e GitHub, HTTP, cache, sincronização e configuração de serviços. |
+| `application/` | Casos de uso e coordenação dos serviços, sem dependência da interface. |
+| `contracts/` | Modelos Pydantic usados como contratos de entrada e saída. |
+| `views/` | Telas e componentes de apresentação organizados por área funcional. |
+| `app.py` | Inicialização, composição do contexto e navegação entre telas. |
+| `settings.py` | Leitura e validação das configurações e variáveis de ambiente. |
+| `tests/` | Testes unitários, de integração simulada e de inicialização da aplicação. |
+| `spikes/` | Provas de conceito isoladas, fora da aplicação principal. |
 
-- **Commit sem chave do Jira é inválido** (aparece como alerta em *Commits*). A descrição deve dizer o que mudou
-  (`ajustes`, `fix`, `wip` são sinalizados). Merges e reverts automáticos são isentos.
-- A chave do Jira é **configurável** (`regex.jira_key_pattern` no `config.json`; por padrão `{JIRA_PROJECT}-\d+`).
-- **`US2.1` é o identificador visual; `JH-123` é o oficial.** Quando os dois aparecem, a chave do Jira vence. `US1.1`,
-  `US1.2` e `US1.3` são User Stories **diferentes** (antes eram todas fundidas em `US1`).
-- O ID visual só é reconhecido como token isolado: `status 1.2`, `bonus 2.5` e `virus 1.1` **não** viram User Story.
+As regras de negócio ficam em `domain/`; chamadas externas ficam em `services/`; a interface não deve concentrar regras de negócio. O diretório `views/` não deve ser renomeado para `pages/`, pois isso altera o comportamento de navegação multipágina do Streamlit.
 
-### O que conta como "entregue"
-Um commit está **entregue** se está na branch padrão **ou** pertence a uma PR *merged* nela. Isso cobre **Squash and Merge**
-(padrão do time), em que o SHA original nunca chega à `main`, e continua valendo se a branch foi apagada. Uma branch
-está entregue quando existe PR merged cujo `head` é o topo atual da branch; commits empurrados depois do merge seguem
-pendentes. Bots (`dependabot`, `github-actions`, `[bot]`…) e merge commits são classificados à parte e não contam como
-atividade de uma pessoa.
+## Requisitos
 
-### Filtros e sincronização
-- A **sprint ativa** é selecionada automaticamente; dá para trocar. Sprint, User Stories e desenvolvedor valem para
-  **todas** as telas (Jira, commits, branches, PRs, worklogs, changelog).
-- Se o Jira/GitHub falhar, a tela mostra **o motivo** (ex.: falha de autenticação, limite de requisições) e, se houver,
-  os últimos dados bons marcados como antigos. Falhas nunca são cacheadas. *Configurações → Sincronização* mostra o estado.
-- Janela do GitHub: `github.lookback_days` (padrão 90). PRs **abertas** são sempre carregadas, por mais antigas que sejam.
-- Todos os horários usam `America/Sao_Paulo`.
-- *Configurações → Autores não mapeados*: vincula autores de commit sem correspondência ao colaborador do Jira.
+- Python 3.12 ou superior.
+- [uv](https://docs.astral.sh/uv/) para instalar o ambiente a partir do lockfile.
+- Acesso a um projeto Jira Cloud e aos repositórios GitHub que serão consultados.
 
-## Setup
-Não precisa mais editar arquivo nenhum na mão: ao abrir o app pela primeira vez (ou sempre que faltar alguma
-variável obrigatória), uma **tela de configuração** aparece pedindo o e-mail e os tokens, testa a conexão com o
-Jira e o GitHub, e já salva o `.env` sozinha.
+## Instalação e configuração
 
-```bash
-git clone https://github.com/kakashinho/dashboard-jira-github.git && cd dashboard-jira-github
-python -m venv venv && venv\Scripts\activate      # Linux/Mac: source venv/bin/activate
-pip install -r requirements.txt
-streamlit run app.py                               # abre a tela de configuração na primeira vez
+```powershell
+git clone https://github.com/C1dneve/Vulpes_Hub.git
+cd Vulpes_Hub
+uv sync --frozen
+uv run streamlit run app.py
 ```
 
-Se preferir preencher o `.env` você mesmo (ex. rodando em CI), copie `.env.example` para `.env` e preencha —
-o app detecta que já está tudo preenchido e não mostra a tela de configuração.
+Na primeira execução, a aplicação apresenta a configuração inicial quando faltam variáveis obrigatórias. Também é possível criar o arquivo local a partir do exemplo:
 
-Depois de configurado, rode `python setup_config.py` de vez em quando pra atualizar a lista de autores do Jira
-usada no `dev_mapping` (ver `config.json`), caso o time mude.
+```powershell
+Copy-Item .env.example .env
+```
 
-## De onde vem cada valor pedido na tela de configuração
-| Variável | Como obter |
+Preencha as variáveis abaixo no `.env`:
+
+| Variável | Uso |
 |---|---|
-| `EMAIL` | E-mail da sua conta Atlassian |
-| `TOKEN` | https://id.atlassian.com/manage-profile/security/api-tokens → **Create API token** (sem escopos) |
-| `JIRA_DOMAIN` | O endereço do seu Jira, ex.: `meuprojeto.atlassian.net` |
-| `BOARD_ID` | Abra o quadro no Jira: o número na URL (`.../boards/34`) |
-| `JIRA_PROJECT` | A sigla das issues (`SCRUM` em `SCRUM-12`) |
-| `GITHUB_TOKEN` | Veja abaixo |
-| `GITHUB_ORG` *(opcional, campo extra na tela)* | Sobrescreve o `org` do `config.json` |
+| `EMAIL` | E-mail da conta Atlassian. |
+| `TOKEN` | Token de API do Jira. |
+| `JIRA_DOMAIN` | Domínio do Jira, por exemplo `empresa.atlassian.net`. |
+| `BOARD_ID` | Identificador numérico do quadro. |
+| `JIRA_PROJECT` | Chave do projeto, por exemplo `SCRUM`. |
+| `GITHUB_TOKEN` | Token com acesso de leitura aos repositórios consultados. |
+| `GITHUB_ORG` | Opcional; substitui a organização definida em `config.json`. |
 
-### Token do GitHub
-- **Classic** (mais simples para repositório de organização): https://github.com/settings/tokens → escopo `repo`. Se a org usa SSO, clique em **Configure SSO → Authorize**.
-- **Fine-grained**: https://github.com/settings/personal-access-tokens → *Resource owner* = a organização, selecione os repositórios e dê **Read-only** em *Contents*, *Pull requests* e *Metadata*. A org pode exigir aprovação de um administrador.
+Crie tokens nos painéis oficiais do [Jira](https://id.atlassian.com/manage-profile/security/api-tokens) e do [GitHub](https://github.com/settings/personal-access-tokens). Conceda somente as permissões de leitura necessárias. Os tokens devem permanecer no `.env` local e nunca devem ser incluídos no repositório.
 
-Os valores digitados na tela de configuração ficam salvos **apenas na máquina de quem está rodando o app**
-(arquivo `.env` local, já listado no `.gitignore`) e nunca são enviados a mais ninguém.
+O arquivo `config.json` define a organização, os repositórios, a janela de consulta do GitHub, os padrões de identificação de issues, os limites dos alertas e o mapeamento entre autores do GitHub e pessoas do Jira. Ajuste esses valores ao ambiente da equipe antes de usar o dashboard.
 
-## `config.json`
-Define `org`, `repos`, `lookback_days`, `bot_logins` (bots extras), `regex.jira_key_pattern`,
-`regex.use_jira_key_as_canonical`, `jira.story_points_field` (opcional), `management` (limiares de gestão: prazo, inatividade, PR sem revisão, etc.) e o `dev_mapping` (`"login_github": "slug-no-jira"`; a comparação ignora maiúsculas e separadores) — precisa ser atualizado manualmente sempre que
-alguém entra ou sai do time. Se uma pessoa sair do grupo, os commits antigos dela no GitHub continuam existindo
-no histórico normalmente — não precisa (nem dá pra) removê-la do mapeamento retroativamente.
+## Convenção Jira ↔ GitHub
 
-## ⚠️ Antes de compartilhar este projeto com o time
-Um `.env` com tokens reais ou a pasta `venv/` **nunca** devem sair da sua máquina. O `.gitignore` já cobre os
-dois quando se usa `git`, mas um `.zip`/pasta compartilhada manualmente (Drive, WhatsApp, etc.) **não respeita o
-`.gitignore` sozinho** — confira à mão antes de enviar:
+O padrão de rastreabilidade é **Branch = User Story · Pull Request = User Story · Commit = Subtask**.
 
-- [ ] O `.zip`/pasta compartilhada **não contém** `.env` nem `venv/` (nem `__pycache__/`).
-- [ ] Se algum `.env` com token real chegou a sair da sua máquina (por zip, e-mail, Drive etc.), **revogue e gere
-      um novo token** — tanto no Jira (`id.atlassian.com/manage-profile/security/api-tokens`) quanto no GitHub
-      (`github.com/settings/tokens` ou `.../personal-access-tokens`) — antes de continuar usando o projeto.
-- [ ] Cada pessoa do time cria o próprio `.env` (pela tela de configuração) e o próprio `venv`
-      (`python -m venv venv && pip install -r requirements.txt`) na máquina dela.
+| Elemento | Padrão | Exemplo |
+|---|---|---|
+| Branch | `feature/{backend ou frontend}/{CHAVE}-{USx.y}-{slug}` | `feature/backend/JH-123-US2.1-cadastro` |
+| Commit | `tipo(CHAVE-DA-SUBTASK): descrição` | `feat(JH-101): validar cadastro` |
+| Pull Request | `[CHAVE-DA-STORY] USx.y — Título` | `[JH-123] US2.1 — Cadastro` |
+
+A chave Jira é a referência principal quando aparece no nome ou na mensagem. As regras completas de vínculo e entrega estão descritas em `docs/MVP_STATUS.md`.
 
 ## Desenvolvimento e testes
-```bash
-pip install -r requirements-dev.txt
-ruff check .
-pytest -q
-```
-Estrutura: `domain/` (regras puras: vínculo, status, fuso, texto, pessoas, prazo/esforço/bloqueio, alertas, tempo em status,
-Burnup, Timeline), `services/` (Jira, GitHub, HTTP, cache, contexto de filtros, sincronização, `mgmt.py` = orquestrador das regras
-de gestão), `settings.py` (`load_settings()`), `app.py` + `ui_components.py` + `views/` (interface; **não** renomear `views/` para `pages/`,
-o Streamlit trataria como multipage) e
-`tests/` (inclui um teste que executa o app inteiro com Jira/GitHub simulados). O CI (`.github/workflows/ci.yml`)
-roda lint e testes a cada push.
 
-## Ainda não implementado (planejado)
-Página Jira ↔ GitHub dedicada, Auditoria, busca global, notificações (e-mail/Teams/WhatsApp), relatórios PDF, CFD/gargalos,
-snapshots/histórico persistente (PostgreSQL), autenticação (Microsoft/Google/OIDC) e perfis DEV TEAM/MASTER. Alertas, página Pessoas,
-Timeline e Burnup **já existem** (MVP; ver `docs/MVP_STATUS.md`). O diagnóstico original está em `docs/AUDITORIA.md`
-(histórico: parte dele descreve o estado anterior ao MVP).
+Instale também as dependências de desenvolvimento:
+
+```bash
+uv sync --frozen --all-groups
+uv run ruff check .
+uv run mypy domain application contracts
+uv run pytest -q --cov --cov-report=term-missing
+uv run pip-audit
+```
+
+O workflow em `.github/workflows/ci.yml` executa essas verificações em Python 3.12 e 3.13 e faz uma varredura de segredos no histórico Git completo. A prova de conceito de Row-Level Security tem ambiente e testes próprios; veja [`spikes/rls/README.md`](spikes/rls/README.md).
+
+## Docker
+
+O Compose principal inicia somente o dashboard. O PostgreSQL não faz parte do runtime nesta fase.
+
+No Windows PowerShell, crie um `.env` vazio antes de iniciar o container caso ainda não exista:
+
+```powershell
+New-Item .env -ItemType File -Force
+docker compose up --build
+```
+
+No Linux/macOS, use `touch .env` antes do `docker compose up --build`. Abra `http://localhost:8501`. A imagem executa a aplicação com usuário não-root e possui healthcheck.
+
+## Compartilhamento e segurança
+
+O `.gitignore` exclui `.env`, ambientes virtuais, caches, logs e saídas reais de validação. Mesmo assim, revise qualquer arquivo compactado antes de compartilhar. Para gerar um ZIP somente com os arquivos versionados no commit atual:
+
+```bash
+git archive --format=zip -o vulpes-hub.zip HEAD
+```
+
+Depois de um push, o Gitleaks no GitHub Actions examina o histórico completo. A execução local anterior encontrou 2 commits e não encontrou vazamentos; isso não substitui a varredura do histórico completo no GitHub. Se um token real tiver sido exposto, revogue-o no provedor e gere outro.
+
+## Próximas entregas
+
+Autenticação OIDC, persistência em PostgreSQL, perfis de acesso, notificações, histórico persistente, busca global e relatórios adicionais estão planejados para fases futuras. O dashboard atual e suas limitações estão descritos em [`docs/MVP_STATUS.md`](docs/MVP_STATUS.md); o planejamento e as decisões técnicas ficam em `docs/plano/PLANO_IMPLEMENTACAO.md` e `docs/adr/ADR.md`.
+
+## Licenciamento
+
+A situação atual é provisória: todos os direitos reservados, sem concessão de licença de uso a terceiros, até decisão jurídica definitiva. A ADR-014 permanece pendente e não há arquivo `LICENSE`. A ausência de licença não deve ser interpretada como autorização para uso, cópia, modificação ou distribuição.

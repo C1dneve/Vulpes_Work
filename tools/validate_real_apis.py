@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""FERRAMENTA DE DIAGNÓSTICO — validação REAL (100% read-only) das APIs Jira e GitHub do Moonfoxes.
+"""FERRAMENTA DE DIAGNÓSTICO — validação REAL (100% read-only) das APIs Jira e GitHub do Vulpes Hub.
 
 Não altera o projeto. Só emite GET/HEAD (exceção opt-in: --allow-jql-post, ver abaixo).
-Credenciais: as MESMAS do Moonfoxes (.env / ambiente): EMAIL, TOKEN, JIRA_DOMAIN, BOARD_ID, JIRA_PROJECT,
+Credenciais: as MESMAS do Vulpes Hub (.env / ambiente): EMAIL, TOKEN, JIRA_DOMAIN, BOARD_ID, JIRA_PROJECT,
 GITHUB_TOKEN. Nenhum segredo é impresso nem gravado (toda saída passa por um redator).
 
 Uso (na raiz do projeto, no Windows/PowerShell ou bash):
@@ -13,7 +13,7 @@ Uso (na raiz do projeto, no Windows/PowerShell ou bash):
 
 Parâmetros NÃO secretos: --jira-domain --board-id --org --repo --branch --issue --pr --since-hours ...
 
-Sobre POST: o JiraService do Moonfoxes usa POST /rest/api/3/search/jql (consulta JQL, semanticamente leitura)
+Sobre POST: o JiraService do Vulpes Hub usa POST /rest/api/3/search/jql (consulta JQL, semanticamente leitura)
 para buscar subtasks que o board não devolveu. Por regra, POST é BLOQUEADO. Se o teste 8 precisar dele, ele
 aborta e diz isso; reexecute com --allow-jql-post para liberar SOMENTE esse endpoint (não altera nada no Jira).
 
@@ -665,7 +665,7 @@ def t6_since(G: Api, base: str, default: str, branches: list[str], chosen: str |
         w = used.pop()
         n = sum(1 for o in outcomes if o["usa"])
         say(f"Conclusão: ✅ `since` filtra por {w} ({n} commit(s) com controles válidos). "
-            f"O Moonfoxes exibe `date = commit.author.date`.", indent=1)
+            f"O Vulpes Hub exibe `date = commit.author.date`.", indent=1)
         return verdict(OK, f"since compara com {w} em {n}/{len(outcomes)} commits testados (controles antes/depois válidos)",
                        testes=outcomes, usa=w)
     if len(used) > 1:
@@ -808,7 +808,7 @@ def t10_gh_reviews(G: Api, base: str, max_prs: int) -> dict:
 
 
 def t8_run(project_root: Path, env_file: Path | None, args, s_override, jira_reachable: bool, gh_reachable: bool, G_diag: Api) -> dict:
-    say("MOONFOXES — QUANTIDADE REAL DE CHAMADAS EM UMA ATUALIZAÇÃO")
+    say("VULPES HUB — QUANTIDADE REAL DE CHAMADAS EM UMA ATUALIZAÇÃO")
     sys.path.insert(0, str(project_root))
     from domain.people import DevMapper
     from services.github import GitHubService
@@ -896,7 +896,7 @@ def t8_run(project_root: Path, env_file: Path | None, args, s_override, jira_rea
 
 # ============================================================================ main
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Validação real read-only das APIs Jira/GitHub do Moonfoxes")
+    ap = argparse.ArgumentParser(description="Validação real read-only das APIs Jira/GitHub do Vulpes Hub")
     ap.add_argument("--project-root", type=Path)
     ap.add_argument("--env-file", type=Path, help=".env alternativo (padrão: <raiz>/.env)")
     ap.add_argument("--jira-domain"), ap.add_argument("--board-id"), ap.add_argument("--org"), ap.add_argument("--repo")
@@ -957,10 +957,10 @@ def main() -> int:
             return verdict(UNK, f"exceção {type(e).__name__}")
 
     # ---- ambiente
-    say("# Validação Real Jira/GitHub — Moonfoxes")
+    say("# Validação Real Jira/GitHub — Vulpes Hub")
     say("## Ambiente")
     fp = hashlib.sha256(b"".join((root / p).read_bytes() for p in ("services/jira.py", "services/github.py", "services/http.py"))).hexdigest()[:12]
-    say(f"Python: {platform.python_version()} | OS: {platform.platform()} | Moonfoxes: sem versão declarada; "
+    say(f"Python: {platform.python_version()} | OS: {platform.platform()} | Vulpes Hub: sem versão declarada; "
         f"impressão digital services/{{jira,github,http}}.py = {fp}", indent=1)
     say(f"Credenciais presentes (sem valores): Jira={'sim' if jira_ready else 'NÃO'} "
         f"GitHub={'sim' if s.github.token else 'NÃO'} | ausentes obrigatórias: {list(s.missing_env) or 'nenhuma'}", indent=1)

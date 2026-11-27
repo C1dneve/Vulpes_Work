@@ -11,6 +11,7 @@ Comentários soltos da conversa da PR (issue comments) não são lidos: só revi
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import pandas as pd
 
@@ -36,7 +37,7 @@ class ReviewSummary:
     last_review_state: str | None = None
 
 
-def summarize_reviews(reviews: list[dict] | None, author_login: str | None, bot_extra: tuple[str, ...] = ()) -> ReviewSummary:
+def summarize_reviews(reviews: list[dict[str, Any]] | None, author_login: str | None, bot_extra: tuple[str, ...] = ()) -> ReviewSummary:
     """`reviews=None` = não foi possível ler (falha da API) → `known=False`; `[]` = lido e sem reviews."""
     if reviews is None:
         return ReviewSummary(known=False)
