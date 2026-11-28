@@ -1,4 +1,4 @@
-"""Vulpes Hub • Dashboard Jira + GitHub."""
+"""Vulpes Work • Dashboard Jira + GitHub."""
 import pandas as pd
 import streamlit as st
 from PIL import Image
@@ -22,7 +22,7 @@ from views.sprint_helpers import SprintAnalytics
 configure_logging()
 
 _icone = ui.ASSETS / "favicon.png"
-st.set_page_config(page_title="Vulpes Hub • Jira + GitHub", page_icon=Image.open(_icone) if _icone.exists() else "🦊",
+st.set_page_config(page_title="Vulpes Work • Jira + GitHub", page_icon=Image.open(_icone) if _icone.exists() else "🦊",
                    layout="wide", initial_sidebar_state="expanded")
 ui.apply_theme()
 

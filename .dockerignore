@@ -24,3 +24,8 @@ tools/validation_output
 .DS_Store
 .idea
 .vscode
+
+# Instruções internas de agentes
+docs/prompts/
+**/PROMPT_*.md
+**/prompt_*.md

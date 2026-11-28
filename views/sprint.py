@@ -72,7 +72,7 @@ def _story_detail(m: Mgmt, sk: str, domain: str) -> None:
     kids = m.items[m.items["story_key"] == sk]
     st.markdown(f"##### 📖 {md_esc(display_id(sk, us))} — {md_esc(s['story_summary'])}")
     st.caption(f"Epic: {md_esc(str(s['epic_summary'] or NA))} · Status no Jira: {s['status_name'] or NA} · Pontos: {fmt_points(s['story_points'])}"
-               f" · Estimado: soma das subtasks (cobertura {s['estimate_coverage']}) · valor CALCULADO pelo Vulpes Hub, não pelo Jira.")
+               f" · Estimado: soma das subtasks (cobertura {s['estimate_coverage']}) · valor CALCULADO pelo Vulpes Work, não pelo Jira.")
     st.markdown("**├── Subtasks** (cada commit só aparece na Subtask cuja chave ele cita)")
     st.dataframe(_subtasks_frame(kids, domain), hide_index=True, use_container_width=True, column_config={"Jira": V.jira_col()})
     for _, t in kids.iterrows():

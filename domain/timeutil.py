@@ -1,4 +1,4 @@
-"""Fuso horário único do Vulpes Hub: America/Sao_Paulo (nunca o fuso do servidor).
+"""Fuso horário único do Vulpes Work: America/Sao_Paulo (nunca o fuso do servidor).
 
 Regra: TODO timestamp que entra no sistema vira tz-aware em `TZ`. Para agrupar por dia usa-se a data
 LOCAL (`local_date`), nunca a data UTC — um commit às 22h em São Paulo é 01h UTC do dia seguinte.

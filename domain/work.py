@@ -1,6 +1,6 @@
 """Regras de gestão de uma task/story (funções puras): prazo, esforço, bloqueio, inatividade, lado BE/FE.
 
-Princípios: ausente continua ausente (`None`), nunca vira 0; valor calculado pelo Vulpes Hub é sempre rotulado como tal;
+Princípios: ausente continua ausente (`None`), nunca vira 0; valor calculado pelo Vulpes Work é sempre rotulado como tal;
 `now`/`today` são parâmetros (testável e sem depender do relógio).
 """
 from __future__ import annotations
@@ -75,7 +75,7 @@ def effort(estimate_h: object, logged_h: object, remaining_h: object) -> Effort:
 
 
 def rollup_effort(items: pd.DataFrame) -> dict[str, object]:
-    """Soma das Subtasks de uma Story (valor CALCULADO pelo Vulpes Hub). Subtask sem estimativa não entra como 0:
+    """Soma das Subtasks de uma Story (valor CALCULADO pelo Vulpes Work). Subtask sem estimativa não entra como 0:
     `estimate_coverage` diz quantas têm estimativa ('3/5') e a soma é None se nenhuma tiver."""
     n = len(items)
     est = items["estimate_h"].dropna() if n else pd.Series(dtype=float)

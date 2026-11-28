@@ -1,5 +1,8 @@
 # Registro da auditoria inicial
 
+> Fonte normativa de produto e decisões: [`Documento Geral V1.2`](DOCUMENTO_GERAL.md).
+
+
 Este documento resume os principais problemas identificados antes da evolução do MVP. Ele serve como histórico; o comportamento atual, as regras e as limitações estão descritos em [`MVP_STATUS.md`](MVP_STATUS.md).
 
 | Área | Problema identificado | Correção registrada |
