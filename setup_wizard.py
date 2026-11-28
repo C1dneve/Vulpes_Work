@@ -61,7 +61,7 @@ def _salvar_env(valores):
 def tela_onboarding():
     st.markdown(
         f'<div class="mf-top"><div class="mf-brand"><img src="data:image/png;base64,{ui.logo_b64()}"/>'
-        f'<h1>Vulpes Hub</h1><p>Configuração inicial</p></div></div>', unsafe_allow_html=True)
+        f'<h1>Vulpes Work</h1><p>Configuração inicial</p></div></div>', unsafe_allow_html=True)
     st.markdown("#### 👋 Bem-vindo! Vamos configurar o acesso ao Jira e ao GitHub")
     st.caption("Isso só precisa ser feito uma vez, nesta máquina. Os valores ficam salvos **apenas aqui**, "
                "num arquivo `.env` dentro da pasta do projeto (que já é ignorado pelo git) — nunca são "

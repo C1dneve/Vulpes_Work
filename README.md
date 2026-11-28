@@ -10,7 +10,6 @@ Plataforma em evolução para gestão colaborativa de entregas, Development Anal
 - [Plano de Implementação vigente](docs/plano/PLANO_IMPLEMENTACAO.md)
 - [Estado e regras do Development Analytics atual](docs/MVP_STATUS.md)
 - [Registro de decisões arquiteturais](docs/adr/README.md)
-- [Prompt Mestre de execução da Fase 0](docs/prompts/PROMPT_MESTRE_FASE_0.md)
 - [Auditoria histórica](docs/AUDITORIA.md)
 - [Política de dependências](docs/DEPENDENCIAS.md)
 
@@ -119,12 +118,13 @@ No Linux/macOS, use `touch .env` antes de `docker compose up --build`. Abra `htt
 - `.env`, caches, ambientes virtuais, logs e saídas reais de validação não devem ser compartilhados nem versionados.
 - Antes de gerar um ZIP, revise os arquivos incluídos; prefira `git archive --format=zip -o vulpes-work.zip HEAD` a compactar a pasta de trabalho inteira.
 - Validações locais reexecutadas em 28/11/2026: Python 3.12 e 3.13, Ruff, mypy, 440 testes (85% de cobertura), `pip-audit`, Docker/healthcheck e Gitleaks 8.30.1 no histórico local passaram; detalhes e proveniência em `docs/MVP_STATUS.md`.
-- A referência histórica `8412ce8` foi identificada. Os 332 corpos de funções `test_*` daquele commit permanecem estruturalmente idênticos em `a812380`; a anotação histórica “224 testes” não corresponde ao inventário do código-fonte e está documentada como divergência, sem afirmar “224/224”.
-- A Fase 0 permanece aberta somente até a confirmação da execução remota do GitHub Actions para a branch de estabilização e a revisão final/commit. Não houve push; a branch de trabalho ainda é local.
+- A referência histórica `8412ce8` foi identificada. Os 332 corpos de funções `test_*` daquele commit permanecem estruturalmente idênticos em `a812380`; a anotação histórica “224 testes” não é reproduzível a partir do inventário do snapshot e está documentada como divergência, sem afirmar “224/224”.
+- A captura fornecida pelo mantenedor mostra três checks do GitHub Actions bem-sucedidos na branch `chore/phase-0-stabilization`: Python 3.12, Python 3.13 e Gitleaks. O SHA e a URL da execução não aparecem na captura; a proveniência está registrada em `docs/MVP_STATUS.md`.
+- As validações técnicas da Fase 0 estão aprovadas. Para encerrar formalmente, aplique os ajustes desta revisão, revise o diff e crie o commit final com a mensagem definida no Plano.
 
 ## Roadmap
 
-- **Fase 0:** baseline e estabilização — fechamento em andamento.
+- **Fase 0:** baseline e estabilização — validações aprovadas; fechamento formal aguardando o commit final.
 - **Fase 1:** fundação da plataforma e piloto vertical de atribuições.
 - **Fase 2:** persistência analítica, sincronização robusta e produtividade pessoal.
 - **Fase 3:** Knowledge Hub e comunicação por Times.

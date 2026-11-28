@@ -33,5 +33,10 @@ tools/validation_output/*
 htmlcov/
 Vulpes_Hub-revisao.patch
 
+# instruções internas de agentes (não fazem parte da documentação do produto)
+docs/prompts/
+**/PROMPT_*.md
+**/prompt_*.md
+
 # logs locais
 *.log

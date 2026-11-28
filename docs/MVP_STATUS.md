@@ -7,25 +7,27 @@ O `docs/MVP_STATUS.md` do commit de referência `8412ce8` descreve a baseline ap
 
 Este documento descreve o que o MVP faz hoje, suas regras, os resultados de validação disponíveis e o que ainda não está resolvido.
 
-## Estado consolidado da Fase 0 — evidências reexecutadas em 28/11/2026
+## Estado consolidado da Fase 0 — fechamento técnico em 28/11/2026
 
 | Item | Situação atual |
 |---|---|
-| Identidade Git | Clone real; branch `chore/phase-0-stabilization`, HEAD `a812380`; `origin/main` atualizado em `40dddf4`; `git fetch --all --tags --prune` concluído. Remote `origin` identificado como `C1dneve/Vulpes_Work`. |
-| Histórico | Repositório não raso; 6 commits alcançáveis nas refs locais, sendo 5 commits não-merge e 1 merge commit. |
-| Python 3.12.16 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes, 85% de cobertura. |
-| Python 3.13.18 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes, 85% de cobertura. |
+| Identidade Git | O mantenedor informou branch `chore/phase-0-stabilization`, HEAD `1b90b1b` sincronizado com `origin/chore/phase-0-stabilization`; `origin/main` em `40dddf4`; remote `origin` identificado como `C1dneve/Vulpes_Work`. |
+| Working tree | Antes desta atualização, `git status --short --branch` mostrava branch sincronizada e sem alterações; `git diff` e `git diff --cached --name-only` vazios. |
+| Python 3.12.16 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes e 85% de cobertura. |
+| Python 3.13.18 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes e 85% de cobertura. |
 | Dependências | `pip-audit`: nenhuma vulnerabilidade conhecida encontrada nas duas execuções. |
-| Docker Compose | `docker compose config` e `docker compose up --build -d` aprovados; container `healthy`; UID/GID `10001:10001`; `/_stcore/health` HTTP 200; `docker compose down` executado. |
-| Gitleaks | Versão 8.30.1; comando `git` e comando exato do workflow (`detect --source . --log-opts="--all" --redact --exit-code 1`) executados; 5 commits examinados, ~3,62 MB, sem achados. |
-| Baseline de testes | Referência `8412ce8` identificada. Os 332 corpos AST de funções `test_*` da baseline estão preservados sem diferenças; 40 funções de teste foram adicionadas. O rótulo histórico “224 testes” não corresponde ao inventário estático do snapshot; ver seção de comparação abaixo. |
-| CI remoto da branch | Pendente: `chore/phase-0-stabilization` existe apenas localmente; não há ref `origin/chore/phase-0-stabilization`. A execução #14 em `40dddf4` não valida o HEAD atual. |
+| Docker Compose | Configuração e build aprovados; container `healthy`; UID/GID `10001:10001`; `/_stcore/health` HTTP 200; container encerrado após a verificação. |
+| Gitleaks | Versão 8.30.1; os comandos `git` e `detect` definidos/compatíveis com o workflow foram executados com `--log-opts="--all"`; 5 commits com alterações, ~3,62 MB, sem achados. Clone não raso. |
+| Baseline de testes | Referência `8412ce8` identificada. Comparação AST reportada: 332 corpos de funções `test_*` preservados em `a812380`, com 40 funções adicionadas. O número histórico “224 testes” não é reproduzível a partir do snapshot e não há manifesto para mapear esses itens; não se afirma “224/224”. |
+| CI remoto | Captura fornecida pelo mantenedor mostra os 3 checks aprovados após push na branch de estabilização: Python 3.12, Python 3.13 e Gitleaks. A captura não exibe SHA/URL da execução; manter essa proveniência explícita. |
 | ADRs | ADRs 001–013 aceitas; ADR-014 pendente e não bloqueia a Fase 0; ADRs 015/017 propostas e ADR-016 pendente para a Fase 3. |
-| `app.py` | 189 linhas no HEAD `a812380`, dentro do limite de 200 descrito no Prompt Mestre. |
+| `app.py` | 189 linhas na baseline revisada; o limite operacional desta estabilização é 200 linhas, salvo justificativa documentada. |
+| Identidade da interface | Textos ativos atualizados para Vulpes Work; `vulpes-hub` permanece apenas como slug técnico histórico do pacote, sem alterar metadados de distribuição nesta fase. |
+| Prompts internos | `docs/prompts/` removida do pacote e ignorada por `.gitignore` e `.dockerignore`; instruções operacionais de agentes não fazem parte da documentação distribuída. |
 
-Os testes, ferramentas, Docker e Gitleaks desta tabela foram reexecutados pelo mantenedor em 28/11/2026, conforme saídas fornecidas nesta conversa. A CI remota da branch atual ainda não foi executada. A Fase 0 permanece aberta até a confirmação da matriz remota e a revisão/commit final. Não houve push.
+Os resultados de instalação, qualidade, Docker e Gitleaks foram executados pelo mantenedor no Windows/PowerShell em 28/11/2026, conforme saídas fornecidas. A CI remota está documentada a partir da captura fornecida pelo mantenedor; o SHA e o identificador da execução não estavam visíveis na imagem. O fechamento formal depende da aplicação desta revisão documental/identidade e do commit final previsto no Plano.
 
-## Reexecução independente nesta sessão — 27/11/2026
+## Reexecução independente nesta sessão — 27/11/2026 (registro histórico, superado pelas evidências de 28/11/2026)
 
 Os itens da tabela anterior são resultados históricos reportados pelo mantenedor. A tabela abaixo registra somente o que foi repetido nesta sessão no clone recebido; resultados bloqueados não são tratados como aprovados.
 
@@ -43,7 +45,7 @@ Os itens da tabela anterior são resultados históricos reportados pelo mantened
 | Gitleaks | Não executado localmente: binário ausente. A execução remota #14 terminou com código 1 no job de Gitleaks; a página pública não disponibilizou logs/annotations para classificar o achado. |
 | CI Python 3.12/3.13 | Workflow configurado com matriz 3.12/3.13; a execução remota #14 falhou no conjunto. O resultado detalhado dos jobs da matriz não ficou acessível, portanto não foi considerado aprovado. |
 
-A execução remota #14 está em [`GitHub Actions`](https://github.com/C1dneve/Vulpes_Work/actions/runs/46018835837). A Fase 0 permanece **aberta** até que os bloqueios obrigatórios sejam resolvidos e comprovados. Nenhuma credencial foi usada nem chamada às APIs Jira/GitHub foi feita; houve apenas consulta pública do status do Actions e tentativa de `git fetch`, bloqueada por DNS.
+A execução remota #14 está em [`GitHub Actions`](https://github.com/C1dneve/Vulpes_Work/actions/runs/46018835837). **Naquela execução de 27/11/2026**, a Fase 0 permanecia aberta pelos bloqueios listados. As pendências de ambiente, Gitleaks local e CI foram posteriormente revalidadas pelo mantenedor em 28/11/2026, conforme a seção de fechamento no fim deste documento. Nenhuma credencial foi usada nem chamada às APIs Jira/GitHub foi feita naquela análise.
 
 ## Como executar
 O ambiente oficial é reproduzido por `uv.lock` em Python 3.12. Na raiz do projeto:
@@ -186,15 +188,14 @@ A suíte atual passou com 440 testes e 85% de cobertura em Python 3.12.16 e 3.13
 O módulo Streamlit permanece preservado. A evolução do produto completo segue as fases do [`Documento Geral`](DOCUMENTO_GERAL.md): Fase 1 (fundação e piloto de atribuições), Fase 2 (Analytics persistente, sincronização e produtividade pessoal), Fase 3 (Knowledge Hub e Canais), Fase 4 (automações e IA assistiva) e Fase 5 (SaaS/expansão). Não usar a terminologia antiga P1/P2 deste documento para reclassificar o roadmap vigente.
 
 
-### Evidências complementares — 27/11/2026
+### Evidências complementares — 27/11/2026 (registro histórico)
 
 - Python 3.12 e 3.13: instalação limpa, Ruff, mypy, pytest (440 aprovados, 85% de cobertura) e pip-audit aprovados.
 - Docker Compose: imagem construída, container iniciado, usuário não-root 10001:10001 e healthcheck HTTP 200.
 - Gitleaks: varredura histórica de 4 commits e aproximadamente 3,43 MB concluída sem achados, exit code 0.
 - Dez fingerprints Sourcegraph registrados individualmente em `.gitleaksignore`, após confirmação do mantenedor de que são fictícios.
 - `.env` permanece ignorado e não rastreado pelo Git.
-- A comparação das 224 asserções originais continua pendente.
-- A validação do GitHub Actions continua pendente de execução remota.
+- Naquela data, a comparação da baseline ainda não havia sido realizada e a execução remota da branch ainda não estava disponível; ambas foram tratadas nas evidências complementares de 28/11/2026.
 
 ## Revalidação do workspace recebido nesta execução — 27/11/2026
 
@@ -234,10 +235,10 @@ Esta seção registra uma nova execução independente, posterior às evidência
 
 ### Estado após a revalidação
 
-A reexecução confirma a compilação e a suíte reduzida, mas não fecha instalação limpa, suíte completa, Python 3.12, Ruff, mypy, `pip-audit`, Docker, CI remoto, Gitleaks no histórico completo ou comparação das 224 asserções originais. A Fase 0 permanece **aberta**. ADRs 001–013 continuam aceitas; ADR-014 permanece pendente e não bloqueia esta fase; ADRs 015/017 são propostas e ADR-016 permanece pendente para a Fase 3. Nenhuma API real de Jira/GitHub foi chamada.
+Naquela reexecução de 27/11/2026, permaneciam bloqueadas a instalação limpa, a suíte completa, Python 3.12, Ruff, mypy, `pip-audit`, Docker, CI remoto, Gitleaks local e a comparação da baseline. Essas pendências foram tratadas nas evidências do mantenedor em 28/11/2026, resumidas na seção de estado consolidado no início deste documento. ADRs 001–013 continuam aceitas; ADR-014 permanece pendente e não bloqueia esta fase; ADRs 015/017 são propostas e ADR-016 permanece pendente para a Fase 3. Nenhuma API real de Jira/GitHub foi chamada naquela reexecução.
 
 
-## Revalidação complementar do mantenedor — 28/11/2026
+## Revalidação complementar do mantenedor — 28/11/2026 (antes da publicação da branch)
 
 ### Ambiente e qualidade local
 
@@ -261,15 +262,23 @@ A reexecução confirma a compilação e a suíte reduzida, mas não fecha insta
 - O comando exato configurado no workflow também foi executado: `gitleaks detect --source . --log-opts="--all" --redact --exit-code 1`; terminou sem achados, examinando 5 commits e aproximadamente 3.621.229 bytes.
 - `git rev-parse --is-shallow-repository` retornou `false`; `git rev-list --all --count` retornou 6 commits alcançáveis, dos quais 5 não são merge commits. A saída de Gitleaks reporta 5 commits com alterações examináveis; o merge commit não acrescenta um patch próprio.
 
-### CI remoto e publicação
+### Situação imediatamente anterior ao push — registro histórico
 
-- `git fetch --all --tags --prune` terminou sem erro. `origin/main` aponta para `40dddf4`.
-- A branch `chore/phase-0-stabilization` permanece local; não existe `origin/chore/phase-0-stabilization`.
-- O workflow `.github/workflows/ci.yml` executa qualidade para Python 3.12 e 3.13 e Gitleaks. A execução #14 conhecida pertence a `40dddf4` em `main`, não ao HEAD `a812380`.
-- A CI remota do HEAD atual continua não verificada. Para executar o workflow nessa branch será necessário publicar a branch; isso exige autorização explícita. Não houve push nem PR.
+- `git fetch --all --tags --prune` terminou sem erro. `origin/main` apontava para `40dddf4`.
+- Naquele momento, a branch `chore/phase-0-stabilization` ainda era local; a CI do HEAD `a812380` não estava disponível.
+- Essa situação foi superada: o mantenedor publicou a branch, informou HEAD `1b90b1b` sincronizado com `origin/chore/phase-0-stabilization` e forneceu captura com três checks remotos aprovados.
 
-### Working tree e arquivos para commit
+### Working tree antes desta revisão
 
-- `core.autocrlf=true`. O `git status` lista vários arquivos como modificados e exibe avisos LF/CRLF; `git diff --ignore-space-at-eol --name-only` identifica apenas `README.md`, `CHANGELOG.md` e `docs/MVP_STATUS.md` como diferenças de conteúdo relevantes nesta atualização.
-- Preparar somente esses três arquivos. Não usar `git add -A`; não alterar globalmente `core.autocrlf`; não executar `reset`, `restore`, `clean` ou renormalização em massa.
-- A atualização documental desta seção não equivale ao commit final. Como a CI remota da branch ainda está pendente, qualquer commit antes dessa evidência deve ser explicitamente parcial, com mensagem diferente da mensagem de conclusão.
+- `core.autocrlf=true`. O mantenedor informou `git status --short --branch` limpo e sem arquivos staged; `git diff` não apresentou diferenças antes desta revisão.
+- Esta revisão altera textos e arquivos de identidade/documentação. Ao aplicar o pacote, revisar o diff e preparar somente os caminhos listados na entrega; não usar `git add -A`.
+
+## Revisão final para encerramento — 28/11/2026
+
+- O commit reportado pelo mantenedor é `1b90b1b` (`feat(phase-0): implements container docker and application and contracts routes, and audit the project`), sincronizado com `origin/chore/phase-0-stabilization`. Não foi realizada reescrita do histórico nem alteração desse commit.
+- A captura fornecida mostra 3 checks verdes: qualidade/dependências Python 3.12, qualidade/dependências Python 3.13 e varredura de segredos no histórico Git. Como SHA e URL de execução não aparecem na captura, a evidência é atribuída ao mantenedor e não a uma consulta independente da API do GitHub.
+- A revalidação local em 28/11/2026 aprovou 440 testes (85% de cobertura), Ruff, mypy e `pip-audit` em Python 3.12.16 e 3.13.18. Docker: container saudável, UID/GID 10001:10001 e healthcheck HTTP 200. Gitleaks 8.30.1: 5 commits com alterações examinados, sem achados, tanto no modo `git` quanto no comando `detect` do workflow.
+- A comparação histórica preserva os 332 corpos de funções `test_*` presentes em `8412ce8`; a nota “224 testes” que consta no status daquele snapshot não pode ser mapeada a um manifesto verificável e permanece registrada como divergência histórica.
+- O Prompt Mestre interno da Fase 0 foi removido do repositório; `docs/prompts/` e padrões `PROMPT_*.md` são ignorados pelo Git, e `docs/prompts/` também é excluída do contexto Docker. Referências ao prompt foram retiradas do README, Plano e Changelog.
+- Textos ativos da interface, onboarding, ferramentas e docstrings foram alinhados à identidade **Vulpes Work**. O slug técnico `vulpes-hub` em `pyproject.toml` não foi alterado porque o Documento Geral V1.2 permite preservar slugs históricos até migração segura. Referências em documentos históricos também foram preservadas como histórico.
+- Após aplicar esta revisão, revisar o diff e criar o commit `chore(phase-0): stabilize baseline and align project docs`. Até esse commit existir no clone, o status formal permanece **fechamento final pendente**.

@@ -2,7 +2,7 @@
 
 > **Versão:** 1.2 — alinhado ao Documento Geral aprovado
 > **Data:** 27/11/2026
-> **Status:** plano vigente; Fase 0 em fechamento, ainda não declarada concluída
+> **Status:** plano vigente; validações técnicas da Fase 0 aprovadas em 28/11/2026; fechamento formal pendente de revisão/aplicação das alterações documentais e commit final.
 > **Fonte normativa:** [`DOCUMENTO_GERAL.md`](../DOCUMENTO_GERAL.md)
 
 Este documento organiza a execução por fases, épicos, histórias, dependências e critérios de saída. O Documento Geral define produto, decisões e limites; este plano não pode alterá-los silenciosamente. Detalhes técnicos específicos devem ser registrados em ADRs e especificações de épicos/US.
@@ -32,20 +32,22 @@ O pacote de referência enviado em 27/11/2026 tem SHA-256 `ced071848f4e2fca79a6d
 
 O pacote contém o dashboard Python/Streamlit, camadas `domain/`, `services/`, `application/` e `contracts/`, testes, Docker, CI e o spike isolado de RLS. Não foi identificado runtime principal com FastAPI, React, PostgreSQL/RLS integrado ou fluxo de atribuições — esses itens são planejados para fases posteriores.
 
-### Evidências já registradas — não equivalem a uma nova execução
+### Evidências consolidadas da Fase 0 — 28/11/2026
 
-- `docs/MVP_STATUS.md` e `CHANGELOG.md` reportam 440 testes aprovados, 85% de cobertura, Ruff, mypy, `pip-audit` e Docker aprovados pelo mantenedor.
-- O spike isolado de RLS reporta 6 testes aprovados.
-- O probe do Jira consultou 20 issues sem falhas de API, mas nenhuma tinha a seção formal de critérios esperada; não foi possível medir a precisão do parser.
-- A comparação das 224 asserções da baseline original com a suíte atual continua pendente.
-- O primeiro resultado verde do GitHub Actions, inclusive matriz Python 3.12/3.13 e Gitleaks no histórico completo, continua pendente.
-- O ZIP contém `.coverage`, `Vulpes_Hub-revisao.patch` e saídas reais em `tools/validation_output/`; precisam ser inspecionados/classificados antes de compartilhar outro pacote.
+Os resultados abaixo foram executados pelo mantenedor no clone Git real ou apresentados por ele como evidência. A proveniência específica está detalhada em `docs/MVP_STATUS.md` e `CHANGELOG.md`.
+
+- Python 3.12.16 e 3.13.18: `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados em ambas as versões; 440 testes por versão e 85% de cobertura.
+- Docker Compose: configuração/build aprovados; container `healthy`, UID/GID `10001:10001` e endpoint de healthcheck HTTP 200.
+- Gitleaks 8.30.1: os comandos `git` e `detect` do workflow foram executados no clone não raso; 5 commits com alterações examinados, sem achados.
+- GitHub Actions: captura fornecida pelo mantenedor mostra os três checks bem-sucedidos — Python 3.12, Python 3.13 e Gitleaks — após push na branch `chore/phase-0-stabilization`. O SHA e a URL da execução não aparecem na captura; a evidência é classificada como reportada pelo mantenedor.
+- Baseline `8412ce8`: comparação AST reportada preserva os 332 corpos das funções `test_*` presentes no snapshot; 40 novas funções foram adicionadas em `a812380`. A anotação “224 testes” do status histórico não corresponde ao inventário do snapshot e não há manifesto que identifique esses 224 itens; não se afirma equivalência literal 224/224.
+- O pacote de compartilhamento mais recente contém 126 arquivos e exclui `.git`, segredos, caches, resultados reais de validação e logs. O Prompt Mestre temporário da Fase 0 foi removido do repositório; a pasta de prompts internos e padrões de arquivos `PROMPT_*.md` são ignorados pelo Git.
 
 ## 3. Fase 0 — Baseline e estabilização
 
 **Objetivo:** manter o dashboard atual reproduzível, testável e seguro enquanto prepara a evolução do Vulpes Work. A Fase 0 não entrega ainda a nova plataforma colaborativa.
 
-**Estado:** em fechamento. Há atividades e resultados importantes reportados, mas os critérios de saída abaixo não estão todos comprovados.
+**Estado:** validações técnicas aprovadas; fechamento formal pendente da atualização documental final, revisão do diff e commit previsto neste plano.
 
 ### EP-01 — Higiene do pacote, identidade e documentação
 
@@ -65,11 +67,11 @@ O pacote contém o dashboard Python/Streamlit, camadas `domain/`, `services/`, `
 
 - **US-02.1 — Ambiente Python:** validar Python 3.12 como ambiente principal, matriz CI com 3.12 e 3.13, `uv.lock` reproduzível e `uv sync --frozen`.
 - **US-02.2 — Fronteiras de módulos:** preservar regras de negócio em `domain/`, integrações em `services/`, casos de uso em `application/`, contratos em `contracts/` e apresentação em `views/`. Não renomear `views/` para `pages/`.
-- **US-02.3 — Composição Streamlit:** manter `app.py` como composição, configuração e roteamento, evitando nova concentração de regras ou refatoração ampla sem necessidade. A baseline anterior registrou 189 linhas; confirmar no clone atual e documentar qualquer desvio relevante.
+- **US-02.3 — Composição Streamlit:** manter `app.py` como composição, configuração e roteamento, evitando nova concentração de regras ou refatoração ampla sem necessidade. A baseline registra 189 linhas; o limite operacional desta estabilização é 200 linhas, salvo justificativa documentada.
 - **US-02.4 — Configuração e segredos:** validar erros de configuração com mensagens claras; não imprimir tokens, cabeçalhos de autorização ou conteúdo sensível em logs.
 - **US-02.5 — Concorrência e sincronização:** preservar idempotência/proteção contra sincronizações duplicadas e distinguir falha, parcial, vazio e dado desatualizado.
 - **US-02.6 — Docker:** confirmar `docker compose up --build`, healthcheck e execução não-root; o Compose principal permanece apenas com o dashboard. PostgreSQL fica restrito ao Compose isolado do spike RLS.
-- **US-02.7 — Regressão:** executar a suíte completa e comparar, quando houver a referência histórica disponível, as 224 asserções originais. Não substituir asserções antigas só para fazer os testes passarem.
+- **US-02.7 — Regressão:** executar a suíte completa e comparar os casos/asserções presentes no commit de referência identificado. O status histórico registra “224 testes”, mas o snapshot `8412ce8` contém 332 funções `test_*` e 607 nós `assert` dentro dessas funções; não existe manifesto para mapear os 224 itens mencionados. A comparação AST dos corpos de todas as 332 funções originais foi concluída e preservada; não declarar uma contagem literal “224/224”. Não substituir testes antigos só para fazer a suíte passar.
 
 **Aceite:** ambiente limpo reproduzível, verificações locais aprovadas, Docker saudável e comportamento do dashboard preservado por testes/evidências verificáveis.
 
@@ -83,18 +85,20 @@ O pacote contém o dashboard Python/Streamlit, camadas `domain/`, `services/`, `
 
 ### Critérios obrigatórios para encerrar a Fase 0
 
-- [ ] Fonte Git real, branch de trabalho e baseline/commit de referência identificados; o ZIP por si só não satisfaz esse item.
-- [ ] Documento Geral V1.2 aprovado e documentos operacionais sincronizados.
-- [ ] Artefatos locais/sensíveis inspecionados e removidos/sanitizados do conjunto versionado quando aplicável.
-- [ ] Instalação limpa por `uv sync --frozen --all-groups` comprovada.
-- [ ] Ruff, mypy, pytest/cobertura e `pip-audit` executados e registrados.
-- [ ] Matriz Python 3.12/3.13 aprovada no GitHub Actions.
-- [ ] Gitleaks executado sobre o histórico Git completo, sem achados não resolvidos.
-- [ ] Docker Compose validado, container saudável e usuário não-root confirmado.
-- [ ] Comparação das 224 asserções originais concluída, ou bloqueio documentado com a referência histórica ausente; não declarar equivalência sem prova.
-- [ ] Status das ADRs coerente; ADR-014 não tratada como bloqueio da Fase 0.
-- [ ] Nenhuma mudança de produto da Fase 1 ou posterior introduzida incidentalmente.
-- [ ] Commit local criado somente após os critérios técnicos exigidos e revisão do diff.
+- [x] Fonte Git real, branch `chore/phase-0-stabilization` e referência histórica `8412ce8` identificadas; o mantenedor reportou HEAD `1b90b1b` sincronizado com `origin/chore/phase-0-stabilization`.
+- [x] Documento Geral V1.2 aprovado; README, Plano, MVP Status, Changelog, Auditoria, Dependências e índice ADR alinhados nesta atualização.
+- [x] Artefatos locais/sensíveis inspecionados; pacote compartilhado de 126 arquivos sem `.git`, `.env`, logs, caches, `.coverage` ou saídas reais de validação. Prompt operacional removido e ignorado.
+- [x] Instalação limpa por `uv sync --frozen --all-groups` comprovada em Python 3.12.16 e 3.13.18.
+- [x] Ruff, mypy, pytest/cobertura e `pip-audit` executados nas duas versões: 440 testes por versão, 85% de cobertura, sem problemas de lint/tipos e sem vulnerabilidades conhecidas reportadas.
+- [x] Matriz Python 3.12/3.13 aprovada no GitHub Actions, conforme captura fornecida pelo mantenedor.
+- [x] Gitleaks 8.30.1 executado no histórico Git não raso, com o comando do workflow e sem achados; o check remoto também aparece aprovado na captura do mantenedor.
+- [x] Docker Compose validado; container saudável, usuário não-root UID/GID 10001:10001 e healthcheck HTTP 200.
+- [x] Comparação AST da suíte presente em `8412ce8` concluída: 332 corpos de funções `test_*` preservados; a anotação histórica “224 testes” não é reproduzível a partir do snapshot e essa divergência está documentada, sem alegar “224/224”.
+- [x] Status das ADRs coerente; ADR-014 permanece pendente e não bloqueia a Fase 0.
+- [x] Nenhuma funcionalidade de produto da Fase 1 ou posterior foi adicionada nesta atualização.
+- [ ] Commit local definitivo criado após aplicar este pacote e revisar o diff. Mensagem obrigatória: `chore(phase-0): stabilize baseline and align project docs`.
+
+**Observação de evidência:** a captura dos checks comprova três resultados verdes, mas não exibe o SHA nem a URL da execução. O mantenedor informa que a execução ocorreu após o push da branch de estabilização; preserve o link/ID da execução no registro do projeto quando disponível.
 
 ## 4. Fase 1 — Fundação da plataforma e piloto vertical de atribuições
 
@@ -164,5 +168,5 @@ Aplicam-se as regras do Documento Geral V1.2, seções 7.1 e 7.2. Cada US deve t
 - Documento de produto e decisões: [`../DOCUMENTO_GERAL.md`](../DOCUMENTO_GERAL.md).
 - ADRs: [`../adr/ADR.md`](../adr/ADR.md) e [`../adr/README.md`](../adr/README.md).
 - Estado do Development Analytics atual: [`../MVP_STATUS.md`](../MVP_STATUS.md).
-- Prompt Mestre para executar a Fase 0: [`../prompts/PROMPT_MESTRE_FASE_0.md`](../prompts/PROMPT_MESTRE_FASE_0.md).
+- Instruções operacionais temporárias de agentes não são distribuídas no repositório; os critérios permanentes de fase ficam neste plano.
 - Plano anterior mantido apenas como histórico: [`arquivo/PLANO_IMPLEMENTACAO_v1.0_SUPERADO.md`](arquivo/PLANO_IMPLEMENTACAO_v1.0_SUPERADO.md).
