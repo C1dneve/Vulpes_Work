@@ -56,11 +56,11 @@ A arquitetura-alvo futura (FastAPI, PostgreSQL/RLS e React) está especificada n
 
 ## Instalação e configuração
 
-Clone o repositório oficial usando o URL remoto confirmado pelo mantenedor. Pacotes ZIP exportados podem não conter metadados Git; para trabalhar com histórico, branches e remotes, use um clone Git real.
+Para reproduzir este checkout, clone o endereço registrado no remote `origin` do pacote. Pacotes ZIP exportados podem não conter metadados Git; para trabalhar com histórico, branches e remotes, use um clone Git real.
 
 ```powershell
-git clone <URL_DO_REPOSITORIO_OFICIAL>
-cd <DIRETORIO_DO_REPOSITORIO>
+git clone https://github.com/C1dneve/Vulpes_Work
+cd Vulpes_Work
 uv sync --frozen --all-groups
 uv run streamlit run app.py
 ```
@@ -118,8 +118,9 @@ No Linux/macOS, use `touch .env` antes de `docker compose up --build`. Abra `htt
 
 - `.env`, caches, ambientes virtuais, logs e saídas reais de validação não devem ser compartilhados nem versionados.
 - Antes de gerar um ZIP, revise os arquivos incluídos; prefira `git archive --format=zip -o vulpes-work.zip HEAD` a compactar a pasta de trabalho inteira.
-- Gitleaks precisa ser aprovado no histórico Git completo. A execução remota mais recente registrada em 27/11/2026 falhou nesse job; consulte `docs/MVP_STATUS.md` antes de considerar a fase encerrada.
-- A Fase 0 permanece aberta: a comparação das 224 asserções originais, a investigação do achado de Gitleaks e as validações completas ainda precisam de evidência. Veja o Plano e o Documento Geral.
+- Validações locais reexecutadas em 28/11/2026: Python 3.12 e 3.13, Ruff, mypy, 440 testes (85% de cobertura), `pip-audit`, Docker/healthcheck e Gitleaks 8.30.1 no histórico local passaram; detalhes e proveniência em `docs/MVP_STATUS.md`.
+- A referência histórica `8412ce8` foi identificada. Os 332 corpos de funções `test_*` daquele commit permanecem estruturalmente idênticos em `a812380`; a anotação histórica “224 testes” não corresponde ao inventário do código-fonte e está documentada como divergência, sem afirmar “224/224”.
+- A Fase 0 permanece aberta somente até a confirmação da execução remota do GitHub Actions para a branch de estabilização e a revisão final/commit. Não houve push; a branch de trabalho ainda é local.
 
 ## Roadmap
 

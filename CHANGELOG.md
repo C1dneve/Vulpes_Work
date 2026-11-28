@@ -12,7 +12,17 @@ Mudanças relevantes do Vulpes Work. A versão `0.1.0` em `pyproject.toml` ident
 - Licença e monetização explicitamente adiadas para antes da Fase 5 ou publicação externa que exija definição jurídica; não bloqueiam o fechamento técnico da Fase 0.
 - **Esta atualização altera documentação; não representa implementação de funcionalidades da Fase 0 nem execução nova da suíte.**
 
+
+### Revalidação complementar da Fase 0 — 28/11/2026
+- O mantenedor reexecutou `uv sync --frozen --all-groups`, Ruff, mypy, pytest com cobertura e `pip-audit` em Python 3.12.16 e 3.13.18: 440 testes aprovados em cada versão, cobertura total de 85%, Ruff/mypy aprovados e nenhuma vulnerabilidade conhecida reportada pelo `pip-audit`.
+- Docker Compose: configuração e build aprovados; container `healthy`, UID/GID `10001:10001`, endpoint `/_stcore/health` HTTP 200; container encerrado após a verificação.
+- Gitleaks 8.30.1 executado com os dois comandos (`gitleaks git` e o comando `detect` definido no workflow), ambos com `--log-opts="--all"`: 5 commits com alterações examinados, aproximadamente 3,62 MB, sem achados. O clone não é shallow e possui 6 commits alcançáveis, incluindo um merge commit.
+- O commit de referência `8412ce8` foi localizado. Comparação AST entre `8412ce8` e `a812380`: os 332 corpos de funções `test_*` presentes na baseline são idênticos; 40 funções de teste foram adicionadas. O código de teste da baseline contém 607 nós `assert` dentro das funções de teste (608 nós `assert` no total dos arquivos de teste). A nota histórica de “224 testes” no `MVP_STATUS.md` de `8412ce8` não coincide com o inventário do snapshot; a documentação registra a discrepância sem alegar uma contagem 224/224.
+- `app.py` permanece com 189 linhas. O workflow remoto da branch `chore/phase-0-stabilization` ainda não foi executado: a branch existe apenas localmente, não há `origin/chore/phase-0-stabilization`. A CI #14 citada anteriormente refere-se ao commit `40dddf4` em `main`, não ao HEAD `a812380`.
+- A Fase 0 permanece aberta até a evidência de CI remoto (matriz Python 3.12/3.13 e Gitleaks) e revisão/commit final. Não houve push.
+
 ### Reexecução da Fase 0 — 27/11/2026
+- Revalidado o workspace ZIP com metadados Git funcionais na branch existente `chore/phase-0-stabilization`; a compilação e 413 testes do subconjunto sem Streamlit passaram (85% de cobertura). Instalação, suíte completa, ferramentas locais, Docker, CI remoto, Gitleaks no histórico completo e comparação da baseline de 224 asserções permanecem bloqueados/não comprovados; evidências detalhadas em `docs/MVP_STATUS.md`. A Fase 0 continua aberta.
 - `compileall` aprovado e subconjunto de 413 testes aprovado com 85% de cobertura; a suíte completa não coletou por falta de Streamlit após bloqueio de rede no `uv sync`.
 - Ruff, mypy, `pip-audit`, Docker e Gitleaks locais não foram executados por indisponibilidade das ferramentas. A execução remota #14 falhou no job Gitleaks; a causa ainda não pôde ser classificada.
 - A referência exata das 224 asserções não foi encontrada. A Fase 0 permanece aberta; detalhes e evidências estão em `docs/MVP_STATUS.md`.

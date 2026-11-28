@@ -3,27 +3,27 @@
 
 > Este documento descreve somente a baseline atual do módulo Development Analytics em Streamlit. A visão, decisões e roadmap do produto completo estão em [`DOCUMENTO_GERAL.md`](DOCUMENTO_GERAL.md); o plano de execução vigente está em [`plano/PLANO_IMPLEMENTACAO.md`](plano/PLANO_IMPLEMENTACAO.md).
 
-A baseline anterior à evolução do MVP tinha 224 testes. A suíte atual passou com 440 testes e cobertura reportada de 85%. A comparação individual das asserções originais com a baseline ainda precisa ser documentada; a contagem maior de testes, por si só, não comprova essa equivalência.
+O `docs/MVP_STATUS.md` do commit de referência `8412ce8` descreve a baseline após a correção dos P0 como “224 testes”. A comparação direta do código-fonte desse commit com `a812380` encontrou 332 funções `test_*` na baseline, todas com corpos AST idênticos no estado atual; não houve remoção nem alteração dos corpos dessas funções e foram adicionadas 40 funções de teste. Há 607 nós `assert` dentro das funções de teste da baseline (608 nós `assert` no total dos arquivos de teste). Como a contagem histórica “224” não coincide com o inventário estático do próprio snapshot e não existe manifesto que identifique quais seriam esses 224 itens, esta documentação não afirma “224/224”; registra a preservação integral das funções de teste efetivamente presentes no commit de referência e a discrepância da contagem histórica.
 
 Este documento descreve o que o MVP faz hoje, suas regras, os resultados de validação disponíveis e o que ainda não está resolvido.
 
-## Estado da Fase 0 — evidências registradas em 27/11/2026
+## Estado consolidado da Fase 0 — evidências reexecutadas em 28/11/2026
 
-| Item | Situação |
+| Item | Situação atual |
 |---|---|
-| ADRs 001–013 | Aprovadas formalmente pelo mantenedor. ADR-014 permanece pendente. |
-| Qualidade local | Ruff aprovado; mypy aprovado em 20 arquivos; 440 testes aprovados; cobertura reportada de 85%. |
-| Dependências | `pip-audit` não encontrou vulnerabilidades conhecidas. |
-| Docker | Build e inicialização concluídos; container saudável; processo executado como `uid=10001`. |
-| Configuração | `load_settings()` retornou `ready=True`, sem variáveis obrigatórias ausentes. |
-| Spike RLS | 6 testes aprovados em ambiente PostgreSQL descartável. |
-| Probe de critérios de aceite | 20 issues consultadas, nenhuma falha de API e nenhuma seção formal de critérios de aceite encontrada. Resultado inconclusivo para medir a precisão do parser. |
-| GitHub Actions | Execução remota #14, no commit `40dddf4` (27/11/2026), falhou no job Gitleaks (código 1). Os logs/annotations não ficaram acessíveis nesta sessão; o resultado individual da matriz de qualidade não foi confirmado. |
-| Baseline de testes | O commit de referência que contém as 224 asserções não foi localizado no histórico disponível. A comparação exata continua bloqueada; não declarar equivalência pela contagem. |
-| Higiene do pacote | `.coverage`, patch antigo e saídas reais foram inspecionados e retirados do índice Git na branch local; os arquivos físicos foram preservados e estão ignorados. `results.example.json` permanece como exemplo versionável. |
-| Licença e distribuição | ADR-014 permanece pendente; decisão antes da Fase 5/publicação externa e não bloqueia a Fase 0. |
+| Identidade Git | Clone real; branch `chore/phase-0-stabilization`, HEAD `a812380`; `origin/main` atualizado em `40dddf4`; `git fetch --all --tags --prune` concluído. Remote `origin` identificado como `C1dneve/Vulpes_Work`. |
+| Histórico | Repositório não raso; 6 commits alcançáveis nas refs locais, sendo 5 commits não-merge e 1 merge commit. |
+| Python 3.12.16 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes, 85% de cobertura. |
+| Python 3.13.18 | `uv sync --frozen --all-groups`, Ruff, mypy, pytest e `pip-audit` aprovados; 440 testes, 85% de cobertura. |
+| Dependências | `pip-audit`: nenhuma vulnerabilidade conhecida encontrada nas duas execuções. |
+| Docker Compose | `docker compose config` e `docker compose up --build -d` aprovados; container `healthy`; UID/GID `10001:10001`; `/_stcore/health` HTTP 200; `docker compose down` executado. |
+| Gitleaks | Versão 8.30.1; comando `git` e comando exato do workflow (`detect --source . --log-opts="--all" --redact --exit-code 1`) executados; 5 commits examinados, ~3,62 MB, sem achados. |
+| Baseline de testes | Referência `8412ce8` identificada. Os 332 corpos AST de funções `test_*` da baseline estão preservados sem diferenças; 40 funções de teste foram adicionadas. O rótulo histórico “224 testes” não corresponde ao inventário estático do snapshot; ver seção de comparação abaixo. |
+| CI remoto da branch | Pendente: `chore/phase-0-stabilization` existe apenas localmente; não há ref `origin/chore/phase-0-stabilization`. A execução #14 em `40dddf4` não valida o HEAD atual. |
+| ADRs | ADRs 001–013 aceitas; ADR-014 pendente e não bloqueia a Fase 0; ADRs 015/017 propostas e ADR-016 pendente para a Fase 3. |
+| `app.py` | 189 linhas no HEAD `a812380`, dentro do limite de 200 descrito no Prompt Mestre. |
 
-Os resultados locais foram executados pelo mantenedor. Eles não substituem a execução do workflow no GitHub, que também examinará o histórico completo do repositório.
+Os testes, ferramentas, Docker e Gitleaks desta tabela foram reexecutados pelo mantenedor em 28/11/2026, conforme saídas fornecidas nesta conversa. A CI remota da branch atual ainda não foi executada. A Fase 0 permanece aberta até a confirmação da matriz remota e a revisão/commit final. Não houve push.
 
 ## Reexecução independente nesta sessão — 27/11/2026
 
@@ -169,8 +169,17 @@ Template recomendado para adoção no Jira:
 
 A medição deve ser repetida quando as issues passarem a usar esse formato.
 
-## Regressões
-A suíte atual cobre as regras de vínculo Commit → Subtask, Sprint própria da Subtask, Jira Key oficial, `on_main` × `delivered_via_pr`, cache (`clear()` ≠ `reset()`) e payload inesperado. A execução mais recente passou com 440 testes. Para declarar formalmente que as 224 asserções da baseline original foram preservadas, ainda falta comparar a suíte e os arquivos de teste com o commit de referência anterior à evolução do MVP.
+## Regressões e comparação da baseline histórica
+
+A referência Git identificada é `8412ce8` (`chore: Freeze the MVP baseline after functional, automated, and real API validation.`). Foi feita uma comparação AST dos arquivos `tests/**/*.py` desse commit com `a812380`:
+
+- Baseline `8412ce8`: 332 funções `test_*`; 607 nós `assert` dentro das funções de teste (608 nós `assert` no total dos arquivos de teste).
+- Estado `a812380`: 372 funções `test_*`; 712 nós `assert` dentro das funções de teste (713 no total).
+- Os corpos AST de todas as 332 funções `test_*` da baseline são idênticos nos dois commits; nenhuma função original foi removida ou alterada. Foram acrescentadas 40 funções de teste e 105 nós `assert` dentro de funções de teste.
+
+**Ressalva de rastreabilidade:** o `docs/MVP_STATUS.md` existente dentro do próprio commit `8412ce8` registra “224 testes”, mas a árvore de código desse mesmo commit contém 332 funções `test_*` e 607 nós `assert` dentro dessas funções. Não foi encontrado manifesto/lista que explique como o número 224 foi calculado. Assim, a preservação estrutural de toda a suíte presente em `8412ce8` está comprovada; não se afirma uma correspondência literal “224/224” porque a métrica histórica não é reproduzível a partir do snapshot.
+
+A suíte atual passou com 440 testes e 85% de cobertura em Python 3.12.16 e 3.13.18. As regras P0 continuam cobertas, incluindo Commit → Subtask, Sprint própria da Subtask, Jira Key oficial, `on_main` × `delivered_via_pr`, cache (`clear()` ≠ `reset()`) e payload inesperado.
 
 ## Roadmap além da baseline atual
 
@@ -186,3 +195,81 @@ O módulo Streamlit permanece preservado. A evolução do produto completo segue
 - `.env` permanece ignorado e não rastreado pelo Git.
 - A comparação das 224 asserções originais continua pendente.
 - A validação do GitHub Actions continua pendente de execução remota.
+
+## Revalidação do workspace recebido nesta execução — 27/11/2026
+
+Esta seção registra uma nova execução independente, posterior às evidências herdadas acima. O pacote chegou como ZIP, mas continha metadados `.git` funcionais; portanto, foi possível inspecionar o histórico e trabalhar sobre a branch existente, sem criar histórico artificial.
+
+### Identificação Git e comparação histórica
+
+- `git rev-parse --is-inside-work-tree`: `true`. Repositório não raso (`git rev-parse --is-shallow-repository`: `false`), com 6 commits alcançáveis nas refs locais e nenhum objeto inalcançável reportado por `git fsck --full --no-reflogs --unreachable`.
+- Branch atual: `chore/phase-0-stabilization`, HEAD `a812380` (`chore(phase-0): record validation progress and update current documentation`), um commit à frente da `main`/`origin/main` local (`40dddf4`). `origin/HEAD` aponta para `origin/main`; remote `origin` configurado como `https://github.com/C1dneve/Vulpes_Work`.
+- `git fetch --prune origin` foi tentado sem credenciais, mas não conseguiu resolver `github.com` (DNS). As refs locais não foram atualizadas e não se afirma que representam o estado remoto mais recente.
+- Após a extração do ZIP, `git status` listou diversos arquivos como modificados por diferenças de metadados da árvore extraída. A comparação de conteúdo (`git diff`) mostrou somente `.gitleaksignore` com diferença de finais de linha CRLF/LF; os demais arquivos rastreados não apresentaram diferenças de conteúdo. Nenhuma alteração de código preexistente foi descartada ou incluída neste registro.
+- O histórico alcançável não contém o commit de referência das 224 asserções originais. Comparação auxiliar reproduzida com `pytest --collect-only`: o commit raiz disponível `8412ce8` coleta 375 node IDs com as mesmas cinco exclusões de interface; a suíte atual coleta 413, preservando os 375 IDs e acrescentando 38. Essa comparação é útil, mas **não** identifica nem comprova a equivalência da baseline original de 224 asserções.
+
+### Verificações reexecutadas
+
+| Verificação | Resultado nesta execução |
+|---|---|
+| Ambiente | Python 3.13.5; uv 0.10.0. Python 3.12 não está instalado neste ambiente. O workflow fixa uv 0.13.9. |
+| `uv sync --frozen --all-groups` | **Bloqueado** por timeout de rede ao baixar `protobuf==6.33.6` de `files.pythonhosted.org`. Nenhuma dependência ou lockfile foi alterado. |
+| `python -m compileall -q .` | **Aprovado**, exit code 0. |
+| `pytest -q --cov --cov-report=term-missing` | **Bloqueado na coleta**: os cinco módulos de interface (`test_app_smoke.py`, `test_mvp_app.py`, `test_people_view.py`, `test_timeline_view.py`, `test_ui_components.py`) não importam porque `streamlit` não está instalado. |
+| Suíte reduzida com as mesmas cinco exclusões | **413 aprovados**, 85% de cobertura, em 4,00 s. Não equivale à suíte completa. |
+| Comparação de node IDs `8412ce8` × HEAD | **375/375 IDs compartilhados**; 38 IDs adicionais na suíte atual. Comparação auxiliar, não substitui a referência de 224 asserções. |
+| Ruff, mypy e `pip-audit` | **Não executados**: executáveis ausentes; sincronização de dependências bloqueada. |
+| Docker/Compose | **Não executado**: Docker/Compose não estão instalados/disponíveis neste ambiente. |
+| Gitleaks no histórico completo | **Não executado**: binário ausente. A varredura heurística local não substitui Gitleaks. A evidência herdada de execução local em 4 commits não comprova nova varredura dos 6 commits alcançáveis deste workspace. |
+| GitHub Actions / matriz Python 3.12 e 3.13 | Workflow local configurado, mas **não revalidado remotamente**. A execução #14 anteriormente reportada falhou no job Gitleaks; os logs não foram consultados nesta execução. |
+| Dockerfile/Compose, YAML e TOML | Sintaxe YAML dos workflows/Compose/Dependabot e TOML do `pyproject.toml` validada por parser local; isso não substitui build nem execução Docker. |
+| Fronteira do domínio | Varredura AST local não encontrou imports proibidos de UI, aplicação, serviços ou persistência dentro de `domain/`. |
+
+### Artefatos e dados sensíveis
+
+- `.env` e `.streamlit/secrets.toml` não estão presentes; `.env.example` é o único arquivo de ambiente versionado.
+- `.coverage`, `Vulpes_Hub-revisao.patch`, `tools/validation_output/results.json` e `tools/validation_output/console.log` estão ignorados pelo Git e não foram adicionados ao commit. O `.coverage` original foi restaurado após a execução de testes; os resultados/logs operacionais contêm identificadores de issues e endereços de e-mail e devem permanecer fora de pacotes compartilhados.
+- A cópia local do patch é byte a byte igual ao blob histórico de `0bd09a9`; o commit `a812380` removeu o patch do conjunto rastreado. O patch altera 14 arquivos de documentação/configuração/assets e não contém alterações de testes ou código de runtime; não foi reaplicado.
+- A inspeção heurística não exibiu valores de credenciais. Ela identificou padrões de token sintéticos usados pelo teste de redação em `tests/test_logging_config.py`; isso não é uma execução de Gitleaks nem prova de ausência de segredos no histórico.
+
+### Estado após a revalidação
+
+A reexecução confirma a compilação e a suíte reduzida, mas não fecha instalação limpa, suíte completa, Python 3.12, Ruff, mypy, `pip-audit`, Docker, CI remoto, Gitleaks no histórico completo ou comparação das 224 asserções originais. A Fase 0 permanece **aberta**. ADRs 001–013 continuam aceitas; ADR-014 permanece pendente e não bloqueia esta fase; ADRs 015/017 são propostas e ADR-016 permanece pendente para a Fase 3. Nenhuma API real de Jira/GitHub foi chamada.
+
+
+## Revalidação complementar do mantenedor — 28/11/2026
+
+### Ambiente e qualidade local
+
+- Windows PowerShell; `uv` instalou CPython 3.12.16 e 3.13.18.
+- Em cada versão: `uv sync --frozen --all-groups`, `uv run --frozen ruff check .`, `uv run --frozen mypy domain application contracts`, `uv run --frozen pytest -q --cov --cov-report=term-missing` e `uv run --frozen pip-audit`.
+- Resultado em Python 3.12.16: Ruff aprovado; mypy sem problemas em 20 arquivos; 440 testes aprovados; cobertura total 85%; pip-audit sem vulnerabilidades conhecidas.
+- Resultado em Python 3.13.18: Ruff aprovado; mypy sem problemas em 20 arquivos; 440 testes aprovados; cobertura total 85%; pip-audit sem vulnerabilidades conhecidas.
+
+### Docker
+
+- `docker compose config`: aprovado.
+- `docker compose up --build -d`: imagem construída e container iniciado.
+- `docker compose ps` / inspect: estado `healthy`.
+- Processo dentro do container: UID 10001, GID 10001.
+- `Invoke-WebRequest http://localhost:8501/_stcore/health`: HTTP 200.
+- `docker compose down`: executado; container e rede removidos.
+
+### Gitleaks e histórico
+
+- Gitleaks 8.30.1. O comando `gitleaks git --log-opts="--all" --redact .` terminou sem achados.
+- O comando exato configurado no workflow também foi executado: `gitleaks detect --source . --log-opts="--all" --redact --exit-code 1`; terminou sem achados, examinando 5 commits e aproximadamente 3.621.229 bytes.
+- `git rev-parse --is-shallow-repository` retornou `false`; `git rev-list --all --count` retornou 6 commits alcançáveis, dos quais 5 não são merge commits. A saída de Gitleaks reporta 5 commits com alterações examináveis; o merge commit não acrescenta um patch próprio.
+
+### CI remoto e publicação
+
+- `git fetch --all --tags --prune` terminou sem erro. `origin/main` aponta para `40dddf4`.
+- A branch `chore/phase-0-stabilization` permanece local; não existe `origin/chore/phase-0-stabilization`.
+- O workflow `.github/workflows/ci.yml` executa qualidade para Python 3.12 e 3.13 e Gitleaks. A execução #14 conhecida pertence a `40dddf4` em `main`, não ao HEAD `a812380`.
+- A CI remota do HEAD atual continua não verificada. Para executar o workflow nessa branch será necessário publicar a branch; isso exige autorização explícita. Não houve push nem PR.
+
+### Working tree e arquivos para commit
+
+- `core.autocrlf=true`. O `git status` lista vários arquivos como modificados e exibe avisos LF/CRLF; `git diff --ignore-space-at-eol --name-only` identifica apenas `README.md`, `CHANGELOG.md` e `docs/MVP_STATUS.md` como diferenças de conteúdo relevantes nesta atualização.
+- Preparar somente esses três arquivos. Não usar `git add -A`; não alterar globalmente `core.autocrlf`; não executar `reset`, `restore`, `clean` ou renormalização em massa.
+- A atualização documental desta seção não equivale ao commit final. Como a CI remota da branch ainda está pendente, qualquer commit antes dessa evidência deve ser explicitamente parcial, com mensagem diferente da mensagem de conclusão.
